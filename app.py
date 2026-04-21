@@ -1,87 +1,60 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import os
-import google.generativeai as genai
+from google import genai
 
 app = FastAPI()
 
 # =========================
-# 🔑 Gemini API Key
+# 🔑 API KEY
 # =========================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-model = None
+client = None
 
 if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-    # =========================
-    # 🧠 自动模型兼容（关键）
-    # =========================
-    MODEL_CANDIDATES = [
-        "gemini-1.5-pro",
-        "gemini-1.5-pro-latest",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-latest",
-    ]
-
-    for m in MODEL_CANDIDATES:
-        try:
-            model = genai.GenerativeModel(m)
-            # 测试一下模型是否可用（轻量验证）
-            break
-        except Exception:
-            continue
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 # =========================
-# 📦 Request Model
+# 📦 request
 # =========================
 class ChatRequest(BaseModel):
     msg: str
 
 
 # =========================
-# 🟢 Root
+# 🟢 root
 # =========================
 @app.get("/")
 def root():
-    return {
-        "status": "xiaomeng online",
-        "model_loaded": model is not None
-    }
+    return {"status": "xiaomeng online"}
 
 
 # =========================
-# ❤️ Health Check
+# ❤️ health
 # =========================
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "gemini_loaded": model is not None
-    }
+    return {"status": "ok", "gemini": client is not None}
 
 
 # =========================
-# 💬 Chat Endpoint
+# 💬 chat
 # =========================
 @app.post("/chat")
 def chat(req: ChatRequest):
 
-    if model is None:
-        return {
-            "error": "Gemini model not loaded. Check API key or model support."
-        }
+    if client is None:
+        return {"error": "No API key"}
 
     try:
-        response = model.generate_content(req.msg)
-        return {
-            "input": req.msg,
-            "reply": response.text
-        }
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=req.msg
+        )
+
+        return {"reply": response.text}
 
     except Exception as e:
-        return {
-            "error": str(e)
-        }
+        return {"error": str(e)}
