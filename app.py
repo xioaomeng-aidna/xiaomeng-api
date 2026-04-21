@@ -1,16 +1,41 @@
-from flask import Flask, request, jsonify
+from fastapi import FastAPI
+from pydantic import BaseModel
+import os
+import google.generativeai as genai
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
-def home():
-    return "小萌 API 雲端基地已啟動"
+# Gemini
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    data = request.get_json()
-    msg = data.get("msg", "")
-    return jsonify({"reply": f"小萌雲端版收到：{msg}"})
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+else:
+    model = None
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+# Request model
+class ChatRequest(BaseModel):
+    msg: str
+
+# Root
+@app.get("/")
+def root():
+    return {"status": "xiaomeng online"}
+
+# Health
+@app.get("/health")
+def health():
+    return {"status": "ok", "gemini": model is not None}
+
+# Chat
+@app.post("/chat")
+def chat(req: ChatRequest):
+    if model is None:
+        return {"error": "No API key"}
+
+    try:
+        res = model.generate_content(req.msg)
+        return {"reply": res.text}
+    except Exception as e:
+        return {"error": str(e)}
