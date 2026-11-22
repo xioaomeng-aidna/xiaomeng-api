@@ -5,7 +5,7 @@ from google import genai
 
 app = FastAPI()
 
-# =========================
+# ========================
 # 🔑 API KEY
 # =========================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
