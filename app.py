@@ -8,7 +8,7 @@ app = FastAPI()
 # ========================
 # 🔌 AI 大脑开关 - 现在先用 gemini
 # ========================
-AI_PROVIDER = "gemini"  # 以后改成 "meta" 或 "openai" 就换大脑
+AI_PROVIDER = "gemini"
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -17,18 +17,18 @@ if GEMINI_API_KEY:
     client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ========================
-# 📦 内存 - 先记在内存里，以后换数据库
+# 📦 内存
 # ========================
-tracking_log = []  # 记走过哪里
-scan_log = []      # 记扫过什么店
+tracking_log = []
+scan_log = []
 
 # ========================
 # 📦 request
 # ========================
 class ChatRequest(BaseModel):
     msg: str
-    floor: str = ""      # 选填：现在在哪一楼
-    x: float = 0         # 选填：地图坐标
+    floor: str = ""
+    x: float = 0
     y: float = 0
 
 class TrackingRequest(BaseModel):
@@ -57,11 +57,6 @@ def ask_gemini(message: str):
 def ask_xiaomeng(message: str):
     if AI_PROVIDER == "gemini":
         return ask_gemini(message)
-    # 以后加：
-    # elif AI_PROVIDER == "meta":
-    #     return ask_meta(message)
-    # elif AI_PROVIDER == "openai":
-    #     return ask_openai(message)
     return "AI_PROVIDER 还没接"
 
 # ========================
@@ -76,27 +71,36 @@ def health():
     return {"status": "ok", "provider": AI_PROVIDER, "gemini": client is not None}
 
 # ========================
-# 💬 chat - 地图问小萌
+# 💬 chat - 会自动用最后一次 tracking 的位置
 # ========================
 @app.post("/chat")
 def chat(req: ChatRequest):
     if client is None:
         return {"error": "No API key"}
     try:
-        # 把位置也告诉小萌，它才知道你在地图哪里
-        prompt = f"用户在商场 {req.floor} 楼，坐标({req.x},{req.y})，他说：{req.msg}。请用简短、像商场导览员一样回答。"
+        floor = req.floor
+        x = req.x
+        y = req.y
+
+        # 重点在这里：如果没传位置，就用最后一次 tracking 的
+        if not floor and tracking_log:
+            last = tracking_log[-1]
+            floor = last.get("floor", "G")
+            x = last.get("x", 0)
+            y = last.get("y", 0)
+
+        prompt = f"用户在商场 {floor} 楼，坐标({x},{y})，他说：{req.msg}。请用简短、像商场导览员一样回答。"
         reply = ask_xiaomeng(prompt)
-        return {"reply": reply, "provider": AI_PROVIDER}
+        return {"reply": reply, "provider": AI_PROVIDER, "used_floor": floor, "used_x": x, "used_y": y}
     except Exception as e:
         return {"error": str(e)}
 
 # ========================
-# 📍 tracking - 后台记位置，不挡地图
+# 📍 tracking
 # ========================
 @app.post("/tracking")
 def tracking(req: TrackingRequest):
     tracking_log.append(req.dict())
-    # 只留最近 100 条
     if len(tracking_log) > 100:
         tracking_log.pop(0)
     return {"status": "tracked", "count": len(tracking_log)}
@@ -106,7 +110,7 @@ def get_tracking():
     return {"tracking": tracking_log[-20:]}
 
 # ========================
-# 📷 scan - 后台记扫了什么
+# 📷 scan
 # ========================
 @app.post("/scan")
 def scan(req: ScanRequest):
