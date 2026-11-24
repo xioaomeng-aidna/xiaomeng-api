@@ -6,79 +6,138 @@
 <title>XiaoMeng 商场导航</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#000;overflow:hidden;position:fixed;width:100%;height:100%}
-#mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#0a0a0a;touch-action:none}
-#mapImg{width:100%;height:100%;object-fit:contain;transform-origin:0 0;will-change:transform;display:block}
-#topBar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;gap:8px;padding:12px;padding-top:max(12px,env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);align-items:center;pointer-events:none}
-#topBar h1{color:#fff;font-size:16px;flex:1;text-shadow:0 1px 4px rgba(0,0,0,.8)}
-.floorBtn{pointer-events:auto;padding:8px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.55);color:#fff;font-size:14px}
-.floorBtn.active{background:#fff;color:#000;font-weight:700}
-#zoomHint{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:6px 12px;border-radius:20px;pointer-events:none;white-space:nowrap}
-#bottom{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10;background:#fff;border-radius:16px;padding:10px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
-#searchRow{display:flex;gap:8px}
-#searchInput{flex:1;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none;min-width:0}
-#searchBtn{padding:0 16px;border:0;background:#111;color:#fff;border-radius:10px;font-size:14px;white-space:nowrap}
-#shopRow{display:flex;gap:8px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
-.chip{white-space:nowrap;padding:7px 12px;background:#f2f2f2;border-radius:20px;font-size:13px;border:0}
-#chatBox{margin-top:8px;max-height:80px;overflow-y:auto;font-size:13px;line-height:1.5;color:#333}
-#resetBtn{position:fixed;right:14px;top:92px;z-index:10;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
+#mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#fff;touch-action:none;display:flex;align-items:center;justify-content:center}
+#mapInner{position:relative;width:100%;height:100%;transform-origin:center center;will-change:transform;display:flex;align-items:center;justify-content:center}
+#mapImg{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#pin{position:absolute;z-index:10;display:none;transform:translate(-50%,-100%);text-align:center;pointer-events:none}
+#pin .pinIcon{font-size:38px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+#pin .pinLabel{background:#d93025;color:#fff;font-size:13px;font-weight:700;padding:4px 10px;border-radius:14px;white-space:nowrap}
+#myDot{position:absolute;width:18px;height:18px;background:#1a73e8;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 6px rgba(26,115,232,.25);display:none;z-index:6}
+#searchBar{position:fixed;top:10px;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;z-index:20;display:flex;align-items:center;gap:6px;background:#fff;border-radius:28px;padding:6px 6px 6px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+#searchInput{flex:1;border:0;outline:none;font-size:16px;min-width:0}
+#aiBtn{border:0;padding:8px 12px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;background:#e8f0fe;color:#1a73e8}
+#aiBtn.on{background:#1a73e8;color:#fff}
+#searchBtn{border:0;background:#1a73e8;color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;flex-shrink:0}
+#suggest{position:fixed;top:58px;left:12px;right:12px;z-index:21;background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.25);overflow:hidden;display:none}
+#suggest button{display:flex;gap:10px;width:100%;padding:12px 14px;border:0;background:#fff;text-align:left;font-size:15px}
+#suggest button+button{border-top:1px solid #eee}
+#chips{position:fixed;top:66px;left:12px;right:12px;z-index:15;display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.chip{white-space:nowrap;padding:8px 14px;background:#fff;border-radius:20px;font-size:14px;border:0;box-shadow:0 1px 6px rgba(0,0,0,.2)}
+.chip.active{background:#1a73e8;color:#fff}
+#rightBar{position:fixed;right:12px;top:120px;z-index:15;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.circleBtn{width:46px;height:46px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);font-size:20px;display:flex;align-items:center;justify-content:center}
+#floorWrap{position:relative}
+#floorBtn{width:46px;height:56px;border-radius:12px;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);font-weight:800;font-size:14px}
+#floorBtn small{display:block;font-size:9px;font-weight:400;color:#666}
+#floorList{position:absolute;right:0;top:62px;background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.25);overflow:hidden;display:none;min-width:52px}
+#floorList button{display:block;width:100%;padding:12px 0;border:0;background:#fff;font-size:14px;font-weight:600}
+#floorList button.active{background:#1a73e8;color:#fff}
+#aiPanel{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:30;background:#fff;border-radius:18px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,.3);display:none}
+#aiPanel.show{display:block}
+#aiHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#aiClose{border:0;background:#f1f3f4;width:28px;height:28px;border-radius:50%;font-size:14px}
+#aiChat{max-height:120px;overflow-y:auto;font-size:14px;line-height:1.6;color:#333}
+#aiInputRow{display:flex;gap:8px;margin-top:10px}
+#aiInput{flex:1;padding:11px;border:1px solid #ddd;border-radius:22px;outline:none;font-size:14px;min-width:0}
+#aiSend{border:0;background:#1a73e8;color:#fff;padding:0 16px;border-radius:22px;font-weight:700}
+#hint{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10;background:rgba(0,0,0,.65);color:#fff;font-size:12px;padding:8px 12px;border-radius:20px;text-align:center;pointer-events:none}
 </style>
 </head>
 <body>
-<div id="mapWrap"><img id="mapImg" src="map-G.png" alt="商场地图"></div>
-<div id="topBar"><h1>🗺️ XiaoMeng 导航</h1><button class="floorBtn active" id="btnG" onclick="setFloor('G')">G</button><button class="floorBtn" id="btnLG" onclick="setFloor('LG')">LG</button></div>
-<div id="zoomHint">双指放大 • 单指拖动 • 点 ↺ 还原</div>
-<button id="resetBtn" onclick="resetMap()">↺</button>
-<div id="bottom">
-<div id="searchRow"><input id="searchInput" placeholder="搜店铺，如：UNIQLO / 奶茶 / 厕所"><button id="searchBtn" onclick="askAI()">问小萌</button></div>
-<div id="shopRow"><button class="chip" onclick="quick('UNIQLO')">UNIQLO</button><button class="chip" onclick="quick('厕所')">🚻 厕所</button><button class="chip" onclick="quick('美食')">🍔 美食</button><button class="chip" onclick="quick('停车场')">🅿️ 停车</button><button class="chip" onclick="quick('奶茶')">🧋 奶茶</button><button class="chip" onclick="quick('电影院')">🎬 电影</button></div>
-<div id="chatBox">👋 你好，我是小萌！双指放在你想看的地方放大，就会以那里为中心放大。</div>
+<div id="mapWrap"><div id="mapInner"><img id="mapImg" src="map-G.png"><div id="pin"><div class="pinIcon">📍</div><div class="pinLabel" id="pinLabel">MAYBANK</div></div><div id="myDot"></div></div></div>
+
+<div id="searchBar"><span>📍</span><input id="searchInput" placeholder="在這裡搜尋，如 maybank" autocomplete="off"><button id="aiBtn" type="button" onclick="toggleAI(event)">✨ AI</button><button id="searchBtn" type="button" onclick="doSearch()">🔍</button></div>
+<div id="suggest"></div>
+
+<div id="chips">
+<button class="chip" onclick="quick('MAYBANK',this)">🏦 MAYBANK</button>
+<button class="chip" onclick="quick('UNIQLO',this)">UNIQLO</button>
+<button class="chip" onclick="quick('AEON',this)">AEON</button>
+<button class="chip" onclick="quick('厕所',this)">🚻 厕所</button>
+<button class="chip" onclick="quick('美食',this)">🍔 美食</button>
+<button class="chip" onclick="quick('停车场',this)">🅿️ 停车</button>
 </div>
+
+<div id="rightBar">
+<button class="circleBtn" onclick="resetNorth()">🧭</button>
+<button class="circleBtn" onclick="locateMe()">🎯</button>
+<div id="floorWrap"><button id="floorBtn" onclick="toggleFloor()"><span id="floorLabel">G</span><small>楼层</small></button><div id="floorList"><button onclick="setFloor('LG',this)">LG</button><button class="active" onclick="setFloor('G',this)">G</button><button onclick="setFloor('1',this)">1</button><button onclick="setFloor('2',this)">2</button><button onclick="setFloor('3',this)">3</button></div></div>
+</div>
+
+<div id="hint">打 maybank 点 🔍 会 Pin 位置 • 点 ✨ AI 开关小萌</div>
+
+<div id="aiPanel"><div id="aiHead"><b>✨ AI 小萌</b><button id="aiClose" onclick="toggleAI(event)">✕</button></div><div id="aiChat">👋 你好，我是小萌！打 maybank，我会在地图上 Pin 给你看。</div><div id="aiInputRow"><input id="aiInput" placeholder="问小萌：maybank 在哪？"><button id="aiSend" onclick="askAI()">发送</button></div></div>
+
 <script>
-let floor='G';
-let scale=1,tx=0,ty=0;
-let startDist=0,startScale=1,startMidX=0,startMidY=0,startTx=0,startTy=0;
-let startX=0,startY=0,lastTx=0,lastTy=0;
-const img=document.getElementById('mapImg');
-const wrap=document.getElementById('mapWrap');
-function apply(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
-function setFloor(f){floor=f;document.getElementById('btnG').classList.toggle('active',f==='G');document.getElementById('btnLG').classList.toggle('active',f==='LG');img.src=f==='G'?'map-G.png':'map-LG.png';resetMap();}
+const SHOPS=[
+ {name:'MAYBANK',floor:'G',x:78,y:42,desc:'G楼，东边，靠近大门'},
+ {name:'UNIQLO',floor:'G',x:62,y:55,desc:'G楼，中间大店'},
+ {name:'AEON',floor:'G',x:85,y:70,desc:'G楼，右边大超市'},
+ {name:'H&M',floor:'G',x:45,y:50,desc:'G楼'},
+ {name:'ZARA',floor:'G',x:35,y:45,desc:'G楼'},
+ {name:'厕所',floor:'G',x:50,y:30,desc:'G楼，中庭旁边'},
+ {name:'美食',floor:'G',x:30,y:70,desc:'G楼，美食区'},
+ {name:'停车场',floor:'LG',x:20,y:80,desc:'LG楼'},
+ {name:'电影',floor:'G',x:70,y:25,desc:'G楼'},
+ {name:'奶茶',floor:'G',x:55,y:65,desc:'G楼'},
+];
+let floor='G',scale=1,tx=0,ty=0,rot=90;
+let startDist=0,startScale=1,startX=0,startY=0;
+let aiOpen=false;
+const inner=document.getElementById('mapInner'),wrap=document.getElementById('mapWrap'),img=document.getElementById('mapImg'),pin=document.getElementById('pin');
+function apply(){inner.style.transform=`translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;}
+apply();
+// ===== AI 开关：点一下开，再点一下关 =====
+function toggleAI(e){
+ if(e){e.stopPropagation();e.preventDefault();}
+ aiOpen=!aiOpen;
+ document.getElementById('aiPanel').style.display=aiOpen?'block':'none';
+ document.getElementById('aiBtn').classList.toggle('on',aiOpen);
+ document.getElementById('aiBtn').textContent=aiOpen?'✨ AI ✓':'✨ AI';
+ document.getElementById('hint').style.display=aiOpen?'none':'block';
+ if(aiOpen){document.getElementById('aiInput').focus();}
+}
+function openAI(){if(!aiOpen)toggleAI();}
+function closeAI(){if(aiOpen)toggleAI();}
+function pinShop(shop){
+ if(shop.floor!==floor){setFloor(shop.floor,null);}
+ pin.style.display='block';pin.style.left=shop.x+'%';pin.style.top=shop.y+'%';
+ document.getElementById('pinLabel').textContent=shop.name;
+ const r=wrap.getBoundingClientRect();const px=(shop.x/100)*r.width,py=(shop.y/100)*r.height;
+ scale=2;tx=r.width/2-px*scale;ty=r.height/2-py*scale;apply();
+ document.getElementById('aiChat').innerHTML='📍 找到 <b>'+shop.name+'</b> 了！<br>'+shop.desc;
+}
+function findShop(q){q=q.toLowerCase().trim();if(!q)return null;return SHOPS.find(s=>s.name.toLowerCase().includes(q)||q.includes(s.name.toLowerCase()))||null;}
+function doSearch(){
+ const q=document.getElementById('searchInput').value.trim();if(!q)return;
+ document.getElementById('suggest').style.display='none';
+ const s=findShop(q);
+ if(s){pinShop(s);}
+ else{document.getElementById('aiInput').value=q;openAI();askAI();}
+}
+document.getElementById('searchInput').addEventListener('input',e=>{
+ const q=e.target.value.trim().toLowerCase();const box=document.getElementById('suggest');
+ if(!q){box.style.display='none';return;}
+ const list=SHOPS.filter(s=>s.name.toLowerCase().includes(q));
+ if(!list.length){box.style.display='none';return;}
+ box.innerHTML=list.map(s=>`<button onclick="pickShop('${s.name}')">📍 ${s.name} · ${s.floor}楼 · ${s.desc}</button>`).join('');
+ box.style.display='block';
+});
+function pickShop(name){document.getElementById('searchInput').value=name;document.getElementById('suggest').style.display='none';doSearch();}
+function quick(t,el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('searchInput').value=t;doSearch();}
+function toggleFloor(){const l=document.getElementById('floorList');l.style.display=l.style.display==='block'?'none':'block';}
+function setFloor(f,btn){floor=f;document.getElementById('floorLabel').textContent=f;document.querySelectorAll('#floorList button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.getElementById('floorList').style.display='none';pin.style.display='none';if(f==='G'||f==='LG')img.src=f==='G'?'map-G.png':'map-LG.png';else img.src='map-G.png';resetMap();}
 function resetMap(){scale=1;tx=0;ty=0;apply();}
+function resetNorth(){rot=90;tx=0;ty=0;scale=1;apply();}
+function locateMe(){const d=document.getElementById('myDot');d.style.display='block';d.style.left='50%';d.style.top='50%';resetMap();}
 function getDist(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
 function getMid(e){return {x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};}
-wrap.addEventListener('touchstart',e=>{
- if(e.touches.length===2){
-  startDist=getDist(e);startScale=scale;
-  const m=getMid(e);startMidX=m.x;startMidY=m.y;startTx=tx;startTy=ty;
- }else if(e.touches.length===1){
-  startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;
- }
-},{passive:false});
-wrap.addEventListener('touchmove',e=>{
- e.preventDefault();
- if(e.touches.length===2){
-  const newScale=Math.min(4,Math.max(1,startScale*getDist(e)/startDist));
-  const m=getMid(e);
-  // 关键：让双指中间点不动，放大就以中间为中心
-  const k=newScale/scale;
-  tx=m.x-(m.x-tx)*k;
-  ty=m.y-(m.y-ty)*k;
-  scale=newScale;
- }else if(e.touches.length===1){
-  tx=e.touches[0].clientX-startX;
-  ty=e.touches[0].clientY-startY;
- }
- apply();
-},{passive:false});
-wrap.addEventListener('wheel',e=>{e.preventDefault();const rect=wrap.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;const ns=Math.min(4,Math.max(1,scale+(e.deltaY<0?0.2:-0.2)));const k=ns/scale;tx=mx-(mx-tx)*k;ty=my-(my-ty)*k;scale=ns;apply();},{passive:false});
-function quick(t){document.getElementById('searchInput').value=t;askAI();}
-async function askAI(){
- const msg=document.getElementById('searchInput').value.trim();if(!msg)return;
- const box=document.getElementById('chatBox');box.innerHTML='⏳ 小萌在想...';
- try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:msg,floor:floor,x:0,y:0})});const d=await r.json();box.innerHTML='🤖 '+(d.reply||d.error||'没收到回复');}
- catch(e){box.innerHTML='⚠️ 网络问题，请再试一次。地图可以继续用。';}
-}
-img.onerror=()=>{if(img.src.includes('map-LG')){img.src='map-G.png';}};
+wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){startDist=getDist(e);startScale=scale;}else if(e.touches.length===1){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}},{passive:false});
+wrap.addEventListener('touchmove',e=>{e.preventDefault();if(e.touches.length===2){const ns=Math.min(4,Math.max(1,startScale*getDist(e)/startDist));const m=getMid(e);const k=ns/scale;tx=m.x-(m.x-tx)*k;ty=m.y-(m.y-ty)*k;scale=ns;}else if(e.touches.length===1){tx=e.touches[0].clientX-startX;ty=e.touches[0].clientY-startY;}apply();},{passive:false});
+async function askAI(){const msg=(document.getElementById('aiInput').value||document.getElementById('searchInput').value).trim();if(!msg)return;const box=document.getElementById('aiChat');box.innerHTML='⏳ 小萌在想...';try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:msg,floor:floor,x:0,y:0})});const d=await r.json();box.innerHTML='🤖 '+(d.reply||d.error||'没收到回复');}catch(e){box.innerHTML='⚠️ 网络问题';}}
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+img.onerror=()=>{if(img.src.includes('map-LG'))img.src='map-G.png';};
 </script>
 </body>
-</html>
+ </html>
