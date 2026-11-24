@@ -6,11 +6,11 @@
 <title>XiaoMeng 商场导航</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
-#mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#fff;touch-action:none;display:flex;align-items:center;justify-content:center}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#000;overflow:hidden;position:fixed;width:100%;height:100%}
+#mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#000;touch-action:none;display:flex;align-items:center;justify-content:center}
 #mapInner{position:relative;width:100vw;height:100dvh;transform-origin:center center;will-change:transform;display:flex;align-items:center;justify-content:center}
-/* 关键：转90度后，图的宽要用屏幕高，高要用屏幕宽，不然就躺下了 */
-#mapImg{width:100dvh;height:100vw;max-width:none;max-height:none;object-fit:contain;display:block}
+/* 这张图本身就是竖的、北朝上，所以用 contain，不要 cover，不要转 */
+#mapImg{max-width:100vw;max-height:100dvh;width:auto;height:100dvh;object-fit:contain;display:block}
 #pin{position:absolute;z-index:10;display:none;transform:translate(-50%,-100%);text-align:center;pointer-events:none}
 #pin .pinIcon{font-size:38px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
 #pin .pinLabel{background:#d93025;color:#fff;font-size:13px;font-weight:700;padding:4px 10px;border-radius:14px;white-space:nowrap}
@@ -55,9 +55,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <button class="chip" onclick="quick('MAYBANK',this)">🏦 MAYBANK</button>
 <button class="chip" onclick="quick('UNIQLO',this)">UNIQLO</button>
 <button class="chip" onclick="quick('AEON',this)">AEON</button>
+<button class="chip" onclick="quick('H&M',this)">H&M</button>
 <button class="chip" onclick="quick('厕所',this)">🚻 厕所</button>
 <button class="chip" onclick="quick('美食',this)">🍔 美食</button>
-<button class="chip" onclick="quick('停车场',this)">🅿️ 停车</button>
 </div>
 
 <div id="rightBar">
@@ -66,24 +66,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div id="floorWrap"><button id="floorBtn" onclick="toggleFloor()"><span id="floorLabel">G</span><small>楼层</small></button><div id="floorList"><button onclick="setFloor('LG',this)">LG</button><button class="active" onclick="setFloor('G',this)">G</button><button onclick="setFloor('1',this)">1</button><button onclick="setFloor('2',this)">2</button><button onclick="setFloor('3',this)">3</button></div></div>
 </div>
 
-<div id="hint">打 maybank 点 🔍 会 Pin 位置 • 点 ✨ AI 开关小萌</div>
+<div id="hint">地图已按北朝上校正 • 打 maybank 点 🔍 会 Pin 位置</div>
 
 <div id="aiPanel"><div id="aiHead"><b>✨ AI 小萌</b><button id="aiClose" onclick="toggleAI(event)">✕</button></div><div id="aiChat">👋 你好，我是小萌！打 maybank，我会在地图上 Pin 给你看。</div><div id="aiInputRow"><input id="aiInput" placeholder="问小萌：maybank 在哪？"><button id="aiSend" onclick="askAI()">发送</button></div></div>
 
 <script>
+// 坐标按你这张竖图重算了：x=左右，y=上下
+// AEON在右上，UNIQLO在右中，H&M在下面，PADINI在最上面
 const SHOPS=[
- {name:'MAYBANK',floor:'G',x:78,y:42,desc:'G楼，东边，靠近大门'},
- {name:'UNIQLO',floor:'G',x:62,y:55,desc:'G楼，中间大店'},
- {name:'AEON',floor:'G',x:85,y:70,desc:'G楼，右边大超市'},
- {name:'H&M',floor:'G',x:45,y:50,desc:'G楼'},
- {name:'ZARA',floor:'G',x:35,y:45,desc:'G楼'},
+ {name:'MAYBANK',floor:'G',x:68,y:48,desc:'G楼，东边走廊'},
+ {name:'UNIQLO',floor:'G',x:78,y:58,desc:'G楼，右边，Victoria’s Secret 旁边'},
+ {name:'AEON',floor:'G',x:76,y:18,desc:'G楼，右上，红色大块'},
+ {name:'H&M',floor:'G',x:48,y:92,desc:'G楼，最下面'},
+ {name:'PADINI',floor:'G',x:52,y:5,desc:'G楼，最上面蓝色'},
+ {name:'Victoria’s Secret',floor:'G',x:58,y:58,desc:'G楼，中间右边'},
  {name:'厕所',floor:'G',x:50,y:30,desc:'G楼，中庭旁边'},
  {name:'美食',floor:'G',x:30,y:70,desc:'G楼，美食区'},
  {name:'停车场',floor:'LG',x:20,y:80,desc:'LG楼'},
  {name:'电影',floor:'G',x:70,y:25,desc:'G楼'},
  {name:'奶茶',floor:'G',x:55,y:65,desc:'G楼'},
 ];
-let floor='G',scale=1,tx=0,ty=0,rot=90;
+let floor='G',scale=1,tx=0,ty=0,rot=0; // 关键：0，不要再转了
 let startDist=0,startScale=1,startX=0,startY=0;
 let aiOpen=false;
 const inner=document.getElementById('mapInner'),wrap=document.getElementById('mapWrap'),img=document.getElementById('mapImg'),pin=document.getElementById('pin');
@@ -120,7 +123,7 @@ function quick(t,el){document.querySelectorAll('.chip').forEach(c=>c.classList.r
 function toggleFloor(){const l=document.getElementById('floorList');l.style.display=l.style.display==='block'?'none':'block';}
 function setFloor(f,btn){floor=f;document.getElementById('floorLabel').textContent=f;document.querySelectorAll('#floorList button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.getElementById('floorList').style.display='none';pin.style.display='none';if(f==='G'||f==='LG')img.src=f==='G'?'map-G.png':'map-LG.png';else img.src='map-G.png';resetMap();}
 function resetMap(){scale=1;tx=0;ty=0;apply();}
-function resetNorth(){rot=90;tx=0;ty=0;scale=1;apply();}
+function resetNorth(){rot=0;tx=0;ty=0;scale=1;apply();} // 指南针也是归 0，不是 90
 function locateMe(){const d=document.getElementById('myDot');d.style.display='block';d.style.left='50%';d.style.top='50%';resetMap();}
 function getDist(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
 function getMid(e){return {x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};}
@@ -131,4 +134,4 @@ document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==
 img.onerror=()=>{if(img.src.includes('map-LG'))img.src='map-G.png';};
 </script>
 </body>
-</html>
+ </html>
