@@ -3,178 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Mid Valley - G Floor</title>
+<title>Mid Valley - G</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif}
-body{overflow:hidden;background:#f2f2f2;height:100dvh}
-/* 顶部搜索 */
+body{overflow:hidden;background:#fff;height:100dvh}
+/* 顶部 */
 .top{position:fixed;top:10px;left:12px;right:12px;z-index:20}
-.search{height:52px;background:#fff;border-radius:28px;display:flex;align-items:center;padding:0 14px;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
-.search input{flex:1;border:0;outline:0;font-size:16px;font-weight:600}
-.search span{font-size:20px}
-.chips{display:flex;gap:8px;margin-top:10px;overflow-x:auto}
-.chip{white-space:nowrap;background:#fff;border-radius:20px;padding:7px 14px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.search{height:52px;background:#fff;border-radius:28px;display:flex;align-items:center;padding:0 10px 0 12px;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.search input{flex:1;border:0;outline:0;font-size:16px;font-weight:700}
+.search img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.chips{display:flex;gap:8px;margin-top:10px}
+.chip{background:#fff;border-radius:20px;padding:7px 14px;font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap}
 .chip.active{background:#111;color:#fff}
-/* 地图区 - 只显示 map-G */
-#viewport{position:fixed;inset:0;overflow:hidden;background:#fff;touch-action:none}
+/* 地图 - 只显示 map-G */
+#viewport{position:fixed;inset:118px 8px 68px 8px;overflow:hidden;background:#fff;border-radius:10px;touch-action:none}
 #mapWrap{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;will-change:transform}
-#mapImg{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;background:#fff}
-/* 店铺点 - 用 XY % */
-.pin{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#4285F4;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;z-index:5}
-.pin.active{background:#EA4335;z-index:8;transform:rotate(-45deg) scale(1.25)}
-.pin-label{position:absolute;transform:translate(-50%,0);background:#111;color:#fff;font-size:11px;padding:3px 7px;border-radius:8px;white-space:nowrap;pointer-events:none}
-/* 我的位置蓝点 */
+#mapImg{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill}
+.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#4285F4;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:5}
+.pin.active{background:#EA4335;z-index:8}
 #me{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;background:#1a73e8;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 6px rgba(26,115,232,.25);z-index:10;display:none}
-/* 路线 */
-#route{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:6}
-/* G 标志 */
-.g-badge{position:fixed;right:16px;bottom:92px;z-index:20;text-align:center;background:rgba(255,255,255,.9);border-radius:14px;padding:6px 10px}
-.g-badge b{font-size:42px;line-height:1;display:block}
-.g-badge span{font-size:10px;font-weight:700;letter-spacing:1px}
-/* 底部图例 */
-.bottom{position:fixed;left:12px;right:12px;bottom:10px;z-index:20;background:#fff;border-radius:16px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.18);font-size:12px}
-.bottom b{color:#EA4335}
-/* 楼层 */
-.floors{position:fixed;left:12px;bottom:92px;z-index:20;display:flex;flex-direction:column;gap:8px}
-.floors button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);font-weight:800}
-.floors button.active{background:#111;color:#fff}
-/* 定位按钮 */
-#locBtn{position:fixed;right:16px;bottom:175px;z-index:20;width:48px;height:48px;border-radius:50%;border:0;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25);font-size:22px}
-/* 详情卡 */
-#card{position:fixed;left:12px;right:12px;bottom:68px;z-index:30;background:#fff;border-radius:18px;padding:14px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-#card h3{font-size:17px}
-#card p{font-size:13px;color:#666;margin:6px 0}
-#card button{width:100%;height:44px;border:0;border-radius:12px;background:#1a73e8;color:#fff;font-weight:700;font-size:15px}
+#route{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6}
+/* 右边工具 - 只有图标，没有红字 */
+.tools{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px}
+.tools button{width:46px;height:46px;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.25);font-size:20px}
+#routeBtn{position:fixed;right:14px;bottom:88px;z-index:20;width:54px;height:54px;border-radius:50%;border:0;background:#1a73e8;color:#fff;font-size:24px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+/* G */
+.g-badge{position:fixed;right:16px;bottom:152px;z-index:20;text-align:center}
+.g-badge b{font-size:68px;line-height:.9;display:block}
+.g-badge span{font-size:10px;font-weight:800;letter-spacing:1px}
+/* 底部 */
+.bottom{position:fixed;left:10px;right:10px;bottom:8px;z-index:20;background:#fff;border-radius:14px;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.15);font-size:11px;white-space:nowrap}
+.bottom span{line-height:1.2;text-align:center}
+/* 卡片 */
+#card{position:fixed;left:12px;right:12px;bottom:68px;z-index:30;background:#fff;border-radius:16px;padding:12px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#card button{width:100%;height:42px;border:0;border-radius:10px;background:#1a73e8;color:#fff;font-weight:700;margin-top:8px}
 </style>
 </head>
 <body>
-
-<div id="viewport">
-  <div id="mapWrap">
-    <img id="mapImg" src="map-G.png" alt="Mid Valley G Floor">
-    <svg id="route"></svg>
-    <div id="me"></div>
-    <div id="pins"></div>
-  </div>
-</div>
-
+<div id="viewport"><div id="mapWrap"><img id="mapImg" src="map-G.png"><svg id="route"></svg><div id="me"></div><div id="pins"></div></div></div>
 <div class="top">
-  <div class="search"><span>📍</span><input id="q" value="MAYBANK G(E)-016" placeholder="搜店铺 / 店号 例如 G-085"><span>🎤</span><span>📷</span></div>
-  <div class="chips">
-    <div class="chip active">💼 公司</div><div class="chip">🍽️ 餐廳</div><div class="chip">🛏️ 酒店</div><div class="chip">🛍️ 购物</div><div class="chip">☕ 咖啡</div>
-  </div>
+  <div class="search"><span style="font-size:22px">📍</span><input id="q" value="MAYBANK G(E)-016"><span style="font-size:20px">🎤</span><span style="font-size:20px">📷</span><img src="https://i.pravatar.cc/40"></div>
+  <div class="chips"><div class="chip active">💼 公司</div><div class="chip">🍽️ 餐廳</div><div class="chip">🛏️ 酒店</div></div>
 </div>
-
-<div class="floors">
-  <button data-floor="LG">LG</button>
-  <button class="active" data-floor="G">G</button>
-  <button data-floor="1">1F</button>
-  <button data-floor="2">2F</button>
-</div>
-<button id="locBtn" title="我的位置">🎯</button>
-
+<div class="tools"><button id="compassBtn" title="指南针">🧭</button><button id="locBtn" title="定位">◎</button><button id="layerBtn" title="图层">◇</button></div>
+<button id="routeBtn">➡️</button>
 <div class="g-badge"><b>G</b><span>GROUND FLOOR</span></div>
-
-<div class="bottom">
-  <span>🛗 Elevator</span><span>↗️ Escalator</span><span>🚽 Toilet</span><span>🚪 Emergency Exit</span><span><b>📍</b> Your Location</span>
-</div>
-
-<div id="card">
-  <h3 id="cardTitle">MAYBANK</h3>
-  <p id="cardSub">G(E)-016 • Ground Floor • Mid Valley Megamall</p>
-  <button id="goBtn">🧭 开始导航 →</button>
-</div>
+<div class="bottom"><span>🛗 Elevator</span><span>↗️ Escalator</span><span>🚽 Toilet</span><span>🚪 Emergency Exit</span><span>📍 Maybank<br>Your Location & Route</span></div>
+<div id="card"><b id="cardTitle">MAYBANK</b><div id="cardSub" style="font-size:13px;color:#666">G(E)-016 • Ground Floor</div><button id="goBtn">开始导航 →</button></div>
 
 <script>
-// ========== 1. 店铺数据：用图片 XY %，不是 GPS ==========
-const shops = [
-  { name:"MAYBANK", code:"G(E)-016", x:58, y:82 },
-  { name:"AEON", code:"G-001", x:68, y:28 },
-  { name:"PADINI CONCEPT STORE", code:"G-010", x:42, y:12 },
-  { name:"UNIQLO", code:"G-050", x:68, y:62 },
-  { name:"H&M", code:"G-071", x:48, y:92 },
-  { name:"VICTORIA'S SECRET", code:"G-040", x:55, y:58 },
-  { name:"ZARA", code:"G-085", x:28, y:35 },
+const shops=[
+ {name:"MAYBANK",code:"G(E)-016",x:60,y:85},
+ {name:"AEON",code:"G-001",x:72,y:18},
+ {name:"PADINI CONCEPT STORE",code:"G-010",x:38,y:12},
+ {name:"UNIQLO",code:"G-050",x:66,y:68},
+ {name:"H&M",code:"G-071",x:45,y:92},
+ {name:"VICTORIA'S SECRET",code:"G-040",x:58,y:62},
+ {name:"ZARA",code:"G-085",x:26,y:32},
 ];
-let selected = shops[0];
-
-// ========== 2. 后台 GPS -> XY 换算表 (界面不显示 GPS 地图) ==========
-// Mid Valley G 层 4 个角的 GPS 对照图片 XY
-const gpsToXY = { topLat:3.1218, bottomLat:3.1145, leftLng:101.6735, rightLng:101.6815 };
-function gpsToXYPercent(lat,lng){
-  const x = (lng - gpsToXY.leftLng) / (gpsToXY.rightLng - gpsToXY.leftLng) * 100;
-  const y = (gpsToXY.topLat - lat) / (gpsToXY.topLat - gpsToXY.bottomLat) * 100;
-  return {x,y};
-}
-
-// 画店铺点
-const pinsEl = document.getElementById('pins');
-function renderPins(){
-  pinsEl.innerHTML='';
-  shops.forEach(s=>{
-    const d=document.createElement('div');
-    d.className='pin'+(s===selected?' active':'');
-    d.style.left=s.x+'%'; d.style.top=s.y+'%';
-    d.onclick=()=>{ selected=s; renderPins(); showCard(s); };
-    const lb=document.createElement('div');
-    lb.className='pin-label'; lb.style.left=s.x+'%'; lb.style.top=(s.y+2)+'%'; lb.textContent=s.name;
-    pinsEl.appendChild(d); pinsEl.appendChild(lb);
-  });
-}
-function showCard(s){
-  document.getElementById('card').style.display='block';
-  document.getElementById('cardTitle').textContent=s.name;
-  document.getElementById('cardSub').textContent=s.code+' • Ground Floor • Mid Valley Megamall';
-}
+let selected=shops[0], myXY=null;
+const pinsEl=document.getElementById('pins');
+function renderPins(){pinsEl.innerHTML='';shops.forEach(s=>{const d=document.createElement('div');d.className='pin'+(s===selected?' active':'');d.style.left=s.x+'%';d.style.top=s.y+'%';d.onclick=()=>{selected=s;renderPins();showCard(s)};pinsEl.appendChild(d);});}
+function showCard(s){document.getElementById('card').style.display='block';document.getElementById('cardTitle').textContent=s.name;document.getElementById('cardSub').textContent=s.code+' • Ground Floor';}
 renderPins(); showCard(selected);
-
-// 搜索
-document.getElementById('q').addEventListener('input', e=>{
-  const v=e.target.value.toLowerCase();
-  const found=shops.find(s=> (s.name+' '+s.code).toLowerCase().includes(v));
-  if(found){ selected=found; renderPins(); showCard(found); }
-});
-
-// ========== 3. 平面图缩放 / 拖动 (只动图片) ==========
-let scale=1, tx=0, ty=0, startX=0, startY=0, lastDist=0;
-const wrap=document.getElementById('mapWrap');
-const vp=document.getElementById('viewport');
-function apply(){ wrap.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
-vp.addEventListener('touchstart',e=>{
-  if(e.touches.length===1){ startX=e.touches[0].clientX-tx; startY=e.touches[0].clientY-ty; }
-  if(e.touches.length===2){ lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY); }
-},{passive:true});
-vp.addEventListener('touchmove',e=>{
-  e.preventDefault();
-  if(e.touches.length===1){ tx=e.touches[0].clientX-startX; ty=e.touches[0].clientY-startY; }
-  if(e.touches.length===2){
-    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX, e.touches[0].clientY-e.touches[1].clientY);
-    if(lastDist) scale=Math.max(1, Math.min(4, scale * d / lastDist));
-    lastDist=d;
-  }
-  apply();
-},{passive:false});
-vp.addEventListener('wheel',e=>{ e.preventDefault(); scale=Math.max(1,Math.min(4, scale - e.deltaY*0.001)); apply(); },{passive:false});
-
-// ========== 4. 定位：GPS 在后台跑，蓝点在图片上动 ==========
-let myXY=null;
-document.getElementById('locBtn').onclick=()=>{
-  if(!navigator.geolocation){ alert('此设备不支持定位'); return; }
-  navigator.geolocation.watchPosition(pos=>{
-    const p=gpsToXYPercent(pos.coords.latitude, pos.coords.longitude);
-    myXY=p;
-    const me=document.getElementById('me');
-    me.style.display='block'; me.style.left=p.x+'%'; me.style.top=p.y+'%';
-  }, err=>alert('定位失败，请开 GPS 权限'), {enableHighAccuracy:true});
-};
-
-// 导航：只在图片上画线
-document.getElementById('goBtn').onclick=()=>{
-  if(!myXY){ alert('先点 🎯 定位'); return; }
-  const svg=document.getElementById('route');
-  svg.innerHTML=`<line x1="${myXY.x}%" y1="${myXY.y}%" x2="${selected.x}%" y2="${selected.y}%" stroke="#1a73e8" stroke-width="4" stroke-dasharray="8 6" />`;
-  alert('已规划路线：蓝点 → '+selected.name+' '+selected.code);
-};
+document.getElementById('q').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const f=shops.find(s=>(s.name+' '+s.code).toLowerCase().includes(v));if(f){selected=f;renderPins();showCard(f);}});
+// 后台 GPS -> XY
+const gps={topLat:3.1218,bottomLat:3.1145,leftLng:101.6735,rightLng:101.6815};
+function gpsToXY(lat,lng){return{x:(lng-gps.leftLng)/(gps.rightLng-gps.leftLng)*100,y:(gps.topLat-lat)/(gps.topLat-gps.bottomLat)*100};}
+// 缩放 - 平滑版
+let scale=1,tx=0,ty=0,startX=0,startY=0,startTX=0,startTY=0,startScale=1,lastDist=0,raf=null;
+const wrap=document.getElementById('mapWrap'),vp=document.getElementById('viewport');
+const MIN=1,MAX=5;
+function apply(){if(raf)return;raf=requestAnimationFrame(()=>{scale=Math.max(MIN,Math.min(MAX,scale));const w=vp.clientWidth,h=vp.clientHeight;const maxX=(scale-1)*w*0.5+100,maxY=(scale-1)*h*0.5+100;tx=Math.max(-maxX,Math.min(maxX,tx));ty=Math.max(-maxY,Math.min(maxY,ty));wrap.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;raf=null;});}
+vp.addEventListener('touchstart',e=>{if(e.touches.length===1){startX=e.touches[0].clientX;startY=e.touches[0].clientY;startTX=tx;startTY=ty;}if(e.touches.length===2){lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);startScale=scale;}},{passive:true});
+vp.addEventListener('touchmove',e=>{if(e.touches.length===1){tx=startTX+(e.touches[0].clientX-startX);ty=startTY+(e.touches[0].clientY-startY);apply();}if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;const ns=Math.max(MIN,Math.min(MAX,startScale*d/lastDist));const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply();}},{passive:false});
+let lastTap=0;vp.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<300){if(scale<2.5)scale=2.5;else{scale=1;tx=0;ty=0;}apply();}lastTap=n;});
+vp.addEventListener('wheel',e=>{e.preventDefault();const r=vp.getBoundingClientRect(),cx=e.clientX-r.left,cy=e.clientY-r.top;const ns=Math.max(MIN,Math.min(MAX,scale-e.deltaY*0.002));const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply();},{passive:false});
+// 定位 / 指南针 / 图层 / 路线 - 功能都在，界面不写红字
+document.getElementById('locBtn').onclick=()=>{navigator.geolocation.watchPosition(p=>{myXY=gpsToXY(p.coords.latitude,p.coords.longitude);const me=document.getElementById('me');me.style.display='block';me.style.left=myXY.x+'%';me.style.top=myXY.y+'%';},{},{enableHighAccuracy:true});};
+document.getElementById('compassBtn').onclick=()=>{scale=1;tx=0;ty=0;apply();alert('已回正北');};
+document.getElementById('layerBtn').onclick=()=>{alert('图层：G / LG / 1F / 2F 切换 (下版接)');};
+function doRoute(){if(!myXY){alert('先点 ◎ 定位');return;}document.getElementById('route').innerHTML=`<line x1="${myXY.x}%" y1="${myXY.y}%" x2="${selected.x}%" y2="${selected.y}%" stroke="#1a73e8" stroke-width="4" stroke-dasharray="8 6" />`;}
+document.getElementById('goBtn').onclick=doRoute;
+document.getElementById('routeBtn').onclick=doRoute;
 </script>
 </body>
 </html>
