@@ -9,19 +9,19 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#000;overflow:hidden;position:fixed;width:100%;height:100%}
 #mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#0a0a0a;touch-action:none}
 #mapImg{width:100%;height:100%;object-fit:contain;transform-origin:0 0;will-change:transform;display:block}
-#topBar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;gap:8px;padding:12px;padding-top:max(12px,env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);align-items:center}
+#topBar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;gap:8px;padding:12px;padding-top:max(12px,env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);align-items:center;pointer-events:none}
 #topBar h1{color:#fff;font-size:16px;flex:1;text-shadow:0 1px 4px rgba(0,0,0,.8)}
-.floorBtn{padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.5);color:#fff;font-size:14px}
+.floorBtn{pointer-events:auto;padding:8px 18px;border-radius:20px;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.55);color:#fff;font-size:14px}
 .floorBtn.active{background:#fff;color:#000;font-weight:700}
-#zoomHint{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:6px 12px;border-radius:20px;pointer-events:none}
+#zoomHint{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:6px 12px;border-radius:20px;pointer-events:none;white-space:nowrap}
 #bottom{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10;background:#fff;border-radius:16px;padding:10px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
 #searchRow{display:flex;gap:8px}
-#searchInput{flex:1;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none}
-#searchBtn{padding:0 16px;border:0;background:#111;color:#fff;border-radius:10px;font-size:14px}
+#searchInput{flex:1;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none;min-width:0}
+#searchBtn{padding:0 16px;border:0;background:#111;color:#fff;border-radius:10px;font-size:14px;white-space:nowrap}
 #shopRow{display:flex;gap:8px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
 .chip{white-space:nowrap;padding:7px 12px;background:#f2f2f2;border-radius:20px;font-size:13px;border:0}
-#chatBox{margin-top:8px;max-height:90px;overflow-y:auto;font-size:13px;line-height:1.5;color:#333}
-#resetBtn{position:fixed;right:14px;top:70px;z-index:10;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+#chatBox{margin-top:8px;max-height:80px;overflow-y:auto;font-size:13px;line-height:1.5;color:#333}
+#resetBtn{position:fixed;right:14px;top:92px;z-index:10;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
@@ -32,52 +32,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div id="bottom">
 <div id="searchRow"><input id="searchInput" placeholder="搜店铺，如：UNIQLO / 奶茶 / 厕所"><button id="searchBtn" onclick="askAI()">问小萌</button></div>
 <div id="shopRow"><button class="chip" onclick="quick('UNIQLO')">UNIQLO</button><button class="chip" onclick="quick('厕所')">🚻 厕所</button><button class="chip" onclick="quick('美食')">🍔 美食</button><button class="chip" onclick="quick('停车场')">🅿️ 停车</button><button class="chip" onclick="quick('奶茶')">🧋 奶茶</button><button class="chip" onclick="quick('电影院')">🎬 电影</button></div>
-<div id="chatBox">👋 你好，我是小萌！在地图上双指放大，单指拖动看细节。想找店直接上面搜。</div>
+<div id="chatBox">👋 你好，我是小萌！双指放在你想看的地方放大，就会以那里为中心放大。</div>
 </div>
 <script>
 let floor='G';
-let scale=1,lastScale=1,tx=0,ty=0,startX=0,startY=0,startDist=0;
+let scale=1,tx=0,ty=0;
+let startDist=0,startScale=1,startMidX=0,startMidY=0,startTx=0,startTy=0;
+let startX=0,startY=0,lastTx=0,lastTy=0;
 const img=document.getElementById('mapImg');
 const wrap=document.getElementById('mapWrap');
 function apply(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
-function setFloor(f){
- floor=f;
- document.getElementById('btnG').classList.toggle('active',f==='G');
- document.getElementById('btnLG').classList.toggle('active',f==='LG');
- img.src=f==='G'?'map-G.png':'map-LG.png';
- resetMap();
-}
+function setFloor(f){floor=f;document.getElementById('btnG').classList.toggle('active',f==='G');document.getElementById('btnLG').classList.toggle('active',f==='LG');img.src=f==='G'?'map-G.png':'map-LG.png';resetMap();}
 function resetMap(){scale=1;tx=0;ty=0;apply();}
 function getDist(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
+function getMid(e){return {x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};}
 wrap.addEventListener('touchstart',e=>{
- if(e.touches.length===2){startDist=getDist(e);lastScale=scale;}
- else if(e.touches.length===1){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}
+ if(e.touches.length===2){
+  startDist=getDist(e);startScale=scale;
+  const m=getMid(e);startMidX=m.x;startMidY=m.y;startTx=tx;startTy=ty;
+ }else if(e.touches.length===1){
+  startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;
+ }
 },{passive:false});
 wrap.addEventListener('touchmove',e=>{
  e.preventDefault();
  if(e.touches.length===2){
-   scale=Math.min(4,Math.max(1,lastScale*getDist(e)/startDist));
+  const newScale=Math.min(4,Math.max(1,startScale*getDist(e)/startDist));
+  const m=getMid(e);
+  // 关键：让双指中间点不动，放大就以中间为中心
+  const k=newScale/scale;
+  tx=m.x-(m.x-tx)*k;
+  ty=m.y-(m.y-ty)*k;
+  scale=newScale;
  }else if(e.touches.length===1){
-   tx=e.touches[0].clientX-startX;
-   ty=e.touches[0].clientY-startY;
+  tx=e.touches[0].clientX-startX;
+  ty=e.touches[0].clientY-startY;
  }
  apply();
 },{passive:false});
-// 鼠标滚轮也能放大，电脑上用
-wrap.addEventListener('wheel',e=>{e.preventDefault();scale=Math.min(4,Math.max(1,scale+(e.deltaY<0?0.2:-0.2)));apply();},{passive:false});
+wrap.addEventListener('wheel',e=>{e.preventDefault();const rect=wrap.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;const ns=Math.min(4,Math.max(1,scale+(e.deltaY<0?0.2:-0.2)));const k=ns/scale;tx=mx-(mx-tx)*k;ty=my-(my-ty)*k;scale=ns;apply();},{passive:false});
 function quick(t){document.getElementById('searchInput').value=t;askAI();}
 async function askAI(){
- const msg=document.getElementById('searchInput').value.trim();
- if(!msg)return;
- const box=document.getElementById('chatBox');
- box.innerHTML='⏳ 小萌在想...';
- try{
-  const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:msg,floor:floor,x:0,y:0})});
-  const d=await r.json();
-  box.innerHTML='🤖 '+(d.reply||d.error||'没收到回复');
- }catch(e){box.innerHTML='⚠️ 网络问题，请再试一次。地图本身可以继续用。';}
+ const msg=document.getElementById('searchInput').value.trim();if(!msg)return;
+ const box=document.getElementById('chatBox');box.innerHTML='⏳ 小萌在想...';
+ try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:msg,floor:floor,x:0,y:0})});const d=await r.json();box.innerHTML='🤖 '+(d.reply||d.error||'没收到回复');}
+ catch(e){box.innerHTML='⚠️ 网络问题，请再试一次。地图可以继续用。';}
 }
-img.onerror=()=>{if(img.src.includes('map-LG')){img.src='map-G.png';document.getElementById('chatBox').innerHTML='💡 LG 地图还没上传，先显示 G 楼地图。';}};
+img.onerror=()=>{if(img.src.includes('map-LG')){img.src='map-G.png';}};
 </script>
 </body>
 </html>
