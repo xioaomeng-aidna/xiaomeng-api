@@ -2,90 +2,82 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Mid Valley - G</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>XiaoMeng 商场导航</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif}
-body{overflow:hidden;background:#fff;height:100dvh}
-/* 顶部 */
-.top{position:fixed;top:10px;left:12px;right:12px;z-index:20}
-.search{height:52px;background:#fff;border-radius:28px;display:flex;align-items:center;padding:0 10px 0 12px;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
-.search input{flex:1;border:0;outline:0;font-size:16px;font-weight:700}
-.search img{width:32px;height:32px;border-radius:50%;object-fit:cover}
-.chips{display:flex;gap:8px;margin-top:10px}
-.chip{background:#fff;border-radius:20px;padding:7px 14px;font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap}
-.chip.active{background:#111;color:#fff}
-/* 地图 - 只显示 map-G */
-#viewport{position:fixed;inset:118px 8px 68px 8px;overflow:hidden;background:#fff;border-radius:10px;touch-action:none}
-#mapWrap{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 0;will-change:transform}
-#mapImg{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill}
-.pin{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#4285F4;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:5}
-.pin.active{background:#EA4335;z-index:8}
-#me{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;background:#1a73e8;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 6px rgba(26,115,232,.25);z-index:10;display:none}
-#route{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6}
-/* 右边工具 - 只有图标，没有红字 */
-.tools{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:20;display:flex;flex-direction:column;gap:10px}
-.tools button{width:46px;height:46px;border-radius:50%;border:0;background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.25);font-size:20px}
-#routeBtn{position:fixed;right:14px;bottom:88px;z-index:20;width:54px;height:54px;border-radius:50%;border:0;background:#1a73e8;color:#fff;font-size:24px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
-/* G */
-.g-badge{position:fixed;right:16px;bottom:152px;z-index:20;text-align:center}
-.g-badge b{font-size:68px;line-height:.9;display:block}
-.g-badge span{font-size:10px;font-weight:800;letter-spacing:1px}
-/* 底部 */
-.bottom{position:fixed;left:10px;right:10px;bottom:8px;z-index:20;background:#fff;border-radius:14px;padding:10px 10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.15);font-size:11px;white-space:nowrap}
-.bottom span{line-height:1.2;text-align:center}
-/* 卡片 */
-#card{position:fixed;left:12px;right:12px;bottom:68px;z-index:30;background:#fff;border-radius:16px;padding:12px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-#card button{width:100%;height:42px;border:0;border-radius:10px;background:#1a73e8;color:#fff;font-weight:700;margin-top:8px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#000;overflow:hidden;position:fixed;width:100%;height:100%}
+#mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#0a0a0a;touch-action:none}
+#mapImg{width:100%;height:100%;object-fit:contain;transform-origin:0 0;will-change:transform;display:block}
+#topBar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;gap:8px;padding:12px;padding-top:max(12px,env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent);align-items:center}
+#topBar h1{color:#fff;font-size:16px;flex:1;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.floorBtn{padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.5);color:#fff;font-size:14px}
+.floorBtn.active{background:#fff;color:#000;font-weight:700}
+#zoomHint{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:6px 12px;border-radius:20px;pointer-events:none}
+#bottom{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10;background:#fff;border-radius:16px;padding:10px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+#searchRow{display:flex;gap:8px}
+#searchInput{flex:1;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px;outline:none}
+#searchBtn{padding:0 16px;border:0;background:#111;color:#fff;border-radius:10px;font-size:14px}
+#shopRow{display:flex;gap:8px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+.chip{white-space:nowrap;padding:7px 12px;background:#f2f2f2;border-radius:20px;font-size:13px;border:0}
+#chatBox{margin-top:8px;max-height:90px;overflow-y:auto;font-size:13px;line-height:1.5;color:#333}
+#resetBtn{position:fixed;right:14px;top:70px;z-index:10;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 </style>
 </head>
 <body>
-<div id="viewport"><div id="mapWrap"><img id="mapImg" src="map-G.png"><svg id="route"></svg><div id="me"></div><div id="pins"></div></div></div>
-<div class="top">
-  <div class="search"><span style="font-size:22px">📍</span><input id="q" value="MAYBANK G(E)-016"><span style="font-size:20px">🎤</span><span style="font-size:20px">📷</span><img src="https://i.pravatar.cc/40"></div>
-  <div class="chips"><div class="chip active">💼 公司</div><div class="chip">🍽️ 餐廳</div><div class="chip">🛏️ 酒店</div></div>
+<div id="mapWrap"><img id="mapImg" src="map-G.png" alt="商场地图"></div>
+<div id="topBar"><h1>🗺️ XiaoMeng 导航</h1><button class="floorBtn active" id="btnG" onclick="setFloor('G')">G</button><button class="floorBtn" id="btnLG" onclick="setFloor('LG')">LG</button></div>
+<div id="zoomHint">双指放大 • 单指拖动 • 点 ↺ 还原</div>
+<button id="resetBtn" onclick="resetMap()">↺</button>
+<div id="bottom">
+<div id="searchRow"><input id="searchInput" placeholder="搜店铺，如：UNIQLO / 奶茶 / 厕所"><button id="searchBtn" onclick="askAI()">问小萌</button></div>
+<div id="shopRow"><button class="chip" onclick="quick('UNIQLO')">UNIQLO</button><button class="chip" onclick="quick('厕所')">🚻 厕所</button><button class="chip" onclick="quick('美食')">🍔 美食</button><button class="chip" onclick="quick('停车场')">🅿️ 停车</button><button class="chip" onclick="quick('奶茶')">🧋 奶茶</button><button class="chip" onclick="quick('电影院')">🎬 电影</button></div>
+<div id="chatBox">👋 你好，我是小萌！在地图上双指放大，单指拖动看细节。想找店直接上面搜。</div>
 </div>
-<div class="tools"><button id="compassBtn" title="指南针">🧭</button><button id="locBtn" title="定位">◎</button><button id="layerBtn" title="图层">◇</button></div>
-<button id="routeBtn">➡️</button>
-<div class="g-badge"><b>G</b><span>GROUND FLOOR</span></div>
-<div class="bottom"><span>🛗 Elevator</span><span>↗️ Escalator</span><span>🚽 Toilet</span><span>🚪 Emergency Exit</span><span>📍 Maybank<br>Your Location & Route</span></div>
-<div id="card"><b id="cardTitle">MAYBANK</b><div id="cardSub" style="font-size:13px;color:#666">G(E)-016 • Ground Floor</div><button id="goBtn">开始导航 →</button></div>
-
 <script>
-const shops=[
- {name:"MAYBANK",code:"G(E)-016",x:60,y:85},
- {name:"AEON",code:"G-001",x:72,y:18},
- {name:"PADINI CONCEPT STORE",code:"G-010",x:38,y:12},
- {name:"UNIQLO",code:"G-050",x:66,y:68},
- {name:"H&M",code:"G-071",x:45,y:92},
- {name:"VICTORIA'S SECRET",code:"G-040",x:58,y:62},
- {name:"ZARA",code:"G-085",x:26,y:32},
-];
-let selected=shops[0], myXY=null;
-const pinsEl=document.getElementById('pins');
-function renderPins(){pinsEl.innerHTML='';shops.forEach(s=>{const d=document.createElement('div');d.className='pin'+(s===selected?' active':'');d.style.left=s.x+'%';d.style.top=s.y+'%';d.onclick=()=>{selected=s;renderPins();showCard(s)};pinsEl.appendChild(d);});}
-function showCard(s){document.getElementById('card').style.display='block';document.getElementById('cardTitle').textContent=s.name;document.getElementById('cardSub').textContent=s.code+' • Ground Floor';}
-renderPins(); showCard(selected);
-document.getElementById('q').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const f=shops.find(s=>(s.name+' '+s.code).toLowerCase().includes(v));if(f){selected=f;renderPins();showCard(f);}});
-// 后台 GPS -> XY
-const gps={topLat:3.1218,bottomLat:3.1145,leftLng:101.6735,rightLng:101.6815};
-function gpsToXY(lat,lng){return{x:(lng-gps.leftLng)/(gps.rightLng-gps.leftLng)*100,y:(gps.topLat-lat)/(gps.topLat-gps.bottomLat)*100};}
-// 缩放 - 平滑版
-let scale=1,tx=0,ty=0,startX=0,startY=0,startTX=0,startTY=0,startScale=1,lastDist=0,raf=null;
-const wrap=document.getElementById('mapWrap'),vp=document.getElementById('viewport');
-const MIN=1,MAX=5;
-function apply(){if(raf)return;raf=requestAnimationFrame(()=>{scale=Math.max(MIN,Math.min(MAX,scale));const w=vp.clientWidth,h=vp.clientHeight;const maxX=(scale-1)*w*0.5+100,maxY=(scale-1)*h*0.5+100;tx=Math.max(-maxX,Math.min(maxX,tx));ty=Math.max(-maxY,Math.min(maxY,ty));wrap.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;raf=null;});}
-vp.addEventListener('touchstart',e=>{if(e.touches.length===1){startX=e.touches[0].clientX;startY=e.touches[0].clientY;startTX=tx;startTY=ty;}if(e.touches.length===2){lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);startScale=scale;}},{passive:true});
-vp.addEventListener('touchmove',e=>{if(e.touches.length===1){tx=startTX+(e.touches[0].clientX-startX);ty=startTY+(e.touches[0].clientY-startY);apply();}if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;const ns=Math.max(MIN,Math.min(MAX,startScale*d/lastDist));const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply();}},{passive:false});
-let lastTap=0;vp.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<300){if(scale<2.5)scale=2.5;else{scale=1;tx=0;ty=0;}apply();}lastTap=n;});
-vp.addEventListener('wheel',e=>{e.preventDefault();const r=vp.getBoundingClientRect(),cx=e.clientX-r.left,cy=e.clientY-r.top;const ns=Math.max(MIN,Math.min(MAX,scale-e.deltaY*0.002));const k=ns/scale;tx=cx-(cx-tx)*k;ty=cy-(cy-ty)*k;scale=ns;apply();},{passive:false});
-// 定位 / 指南针 / 图层 / 路线 - 功能都在，界面不写红字
-document.getElementById('locBtn').onclick=()=>{navigator.geolocation.watchPosition(p=>{myXY=gpsToXY(p.coords.latitude,p.coords.longitude);const me=document.getElementById('me');me.style.display='block';me.style.left=myXY.x+'%';me.style.top=myXY.y+'%';},{},{enableHighAccuracy:true});};
-document.getElementById('compassBtn').onclick=()=>{scale=1;tx=0;ty=0;apply();alert('已回正北');};
-document.getElementById('layerBtn').onclick=()=>{alert('图层：G / LG / 1F / 2F 切换 (下版接)');};
-function doRoute(){if(!myXY){alert('先点 ◎ 定位');return;}document.getElementById('route').innerHTML=`<line x1="${myXY.x}%" y1="${myXY.y}%" x2="${selected.x}%" y2="${selected.y}%" stroke="#1a73e8" stroke-width="4" stroke-dasharray="8 6" />`;}
-document.getElementById('goBtn').onclick=doRoute;
-document.getElementById('routeBtn').onclick=doRoute;
+let floor='G';
+let scale=1,lastScale=1,tx=0,ty=0,startX=0,startY=0,startDist=0;
+const img=document.getElementById('mapImg');
+const wrap=document.getElementById('mapWrap');
+function apply(){img.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
+function setFloor(f){
+ floor=f;
+ document.getElementById('btnG').classList.toggle('active',f==='G');
+ document.getElementById('btnLG').classList.toggle('active',f==='LG');
+ img.src=f==='G'?'map-G.png':'map-LG.png';
+ resetMap();
+}
+function resetMap(){scale=1;tx=0;ty=0;apply();}
+function getDist(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
+wrap.addEventListener('touchstart',e=>{
+ if(e.touches.length===2){startDist=getDist(e);lastScale=scale;}
+ else if(e.touches.length===1){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}
+},{passive:false});
+wrap.addEventListener('touchmove',e=>{
+ e.preventDefault();
+ if(e.touches.length===2){
+   scale=Math.min(4,Math.max(1,lastScale*getDist(e)/startDist));
+ }else if(e.touches.length===1){
+   tx=e.touches[0].clientX-startX;
+   ty=e.touches[0].clientY-startY;
+ }
+ apply();
+},{passive:false});
+// 鼠标滚轮也能放大，电脑上用
+wrap.addEventListener('wheel',e=>{e.preventDefault();scale=Math.min(4,Math.max(1,scale+(e.deltaY<0?0.2:-0.2)));apply();},{passive:false});
+function quick(t){document.getElementById('searchInput').value=t;askAI();}
+async function askAI(){
+ const msg=document.getElementById('searchInput').value.trim();
+ if(!msg)return;
+ const box=document.getElementById('chatBox');
+ box.innerHTML='⏳ 小萌在想...';
+ try{
+  const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:msg,floor:floor,x:0,y:0})});
+  const d=await r.json();
+  box.innerHTML='🤖 '+(d.reply||d.error||'没收到回复');
+ }catch(e){box.innerHTML='⚠️ 网络问题，请再试一次。地图本身可以继续用。';}
+}
+img.onerror=()=>{if(img.src.includes('map-LG')){img.src='map-G.png';document.getElementById('chatBox').innerHTML='💡 LG 地图还没上传，先显示 G 楼地图。';}};
 </script>
 </body>
 </html>
