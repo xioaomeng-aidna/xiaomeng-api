@@ -8,8 +8,9 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#fff;overflow:hidden;position:fixed;width:100%;height:100%}
 #mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#fff;touch-action:none;display:flex;align-items:center;justify-content:center}
-#mapInner{position:relative;width:100%;height:100%;transform-origin:center center;will-change:transform;display:flex;align-items:center;justify-content:center}
-#mapImg{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#mapInner{position:relative;width:100vw;height:100dvh;transform-origin:center center;will-change:transform;display:flex;align-items:center;justify-content:center}
+/* 关键：转90度后，图的宽要用屏幕高，高要用屏幕宽，不然就躺下了 */
+#mapImg{width:100dvh;height:100vw;max-width:none;max-height:none;object-fit:contain;display:block}
 #pin{position:absolute;z-index:10;display:none;transform:translate(-50%,-100%);text-align:center;pointer-events:none}
 #pin .pinIcon{font-size:38px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
 #pin .pinLabel{background:#d93025;color:#fff;font-size:13px;font-weight:700;padding:4px 10px;border-radius:14px;white-space:nowrap}
@@ -88,18 +89,8 @@ let aiOpen=false;
 const inner=document.getElementById('mapInner'),wrap=document.getElementById('mapWrap'),img=document.getElementById('mapImg'),pin=document.getElementById('pin');
 function apply(){inner.style.transform=`translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;}
 apply();
-// ===== AI 开关：点一下开，再点一下关 =====
-function toggleAI(e){
- if(e){e.stopPropagation();e.preventDefault();}
- aiOpen=!aiOpen;
- document.getElementById('aiPanel').style.display=aiOpen?'block':'none';
- document.getElementById('aiBtn').classList.toggle('on',aiOpen);
- document.getElementById('aiBtn').textContent=aiOpen?'✨ AI ✓':'✨ AI';
- document.getElementById('hint').style.display=aiOpen?'none':'block';
- if(aiOpen){document.getElementById('aiInput').focus();}
-}
+function toggleAI(e){if(e){e.stopPropagation();e.preventDefault();}aiOpen=!aiOpen;document.getElementById('aiPanel').style.display=aiOpen?'block':'none';document.getElementById('aiBtn').classList.toggle('on',aiOpen);document.getElementById('aiBtn').textContent=aiOpen?'✨ AI ✓':'✨ AI';document.getElementById('hint').style.display=aiOpen?'none':'block';}
 function openAI(){if(!aiOpen)toggleAI();}
-function closeAI(){if(aiOpen)toggleAI();}
 function pinShop(shop){
  if(shop.floor!==floor){setFloor(shop.floor,null);}
  pin.style.display='block';pin.style.left=shop.x+'%';pin.style.top=shop.y+'%';
@@ -140,4 +131,4 @@ document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==
 img.onerror=()=>{if(img.src.includes('map-LG'))img.src='map-G.png';};
 </script>
 </body>
- </html>
+</html>
