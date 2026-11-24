@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import os
 from google import genai
@@ -60,11 +61,27 @@ def ask_xiaomeng(message: str):
     return "AI_PROVIDER 还没接"
 
 # ========================
-# 🟢 root / health
+# 🗺️ 地图页面 - 新增的，只有这部分是新的
 # ========================
 @app.get("/")
 def root():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
     return {"status": "xiaomeng online", "provider": AI_PROVIDER}
+
+@app.get("/index.html")
+def index_page():
+    return FileResponse("index.html")
+
+@app.get("/map-G.png")
+def map_g():
+    return FileResponse("map-G.png")
+
+@app.get("/map-LG.png")
+def map_lg():
+    if os.path.exists("map-LG.png"):
+        return FileResponse("map-LG.png")
+    return FileResponse("map-G.png")
 
 @app.get("/health")
 def health():
@@ -81,14 +98,11 @@ def chat(req: ChatRequest):
         floor = req.floor
         x = req.x
         y = req.y
-
-        # 重点在这里：如果没传位置，就用最后一次 tracking 的
         if not floor and tracking_log:
             last = tracking_log[-1]
             floor = last.get("floor", "G")
             x = last.get("x", 0)
             y = last.get("y", 0)
-
         prompt = f"用户在商场 {floor} 楼，坐标({x},{y})，他说：{req.msg}。请用简短、像商场导览员一样回答。"
         reply = ask_xiaomeng(prompt)
         return {"reply": reply, "provider": AI_PROVIDER, "used_floor": floor, "used_x": x, "used_y": y}
