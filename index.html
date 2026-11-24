@@ -6,57 +6,89 @@
 <title>我的商场地图</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  body { margin:0; padding:0; }
-  #map { width:100vw; height:100vh; }
-  #info {
-    position: fixed; top:10px; left:10px; z-index:1000;
-    background:white; padding:10px 14px; border-radius:12px;
-    font-family: sans-serif; font-size:14px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.2);
-  }
-  button {
-    margin-top:8px; width:100%; padding:8px;
-    background:#4285F4; color:white; border:none; border-radius:8px;
-  }
+  body{margin:0;padding:0;font-family:sans-serif}
+  #map{width:100vw;height:100vh}
+  #info{position:fixed;top:10px;left:10px;z-index:1000;background:white;padding:10px 14px;border-radius:12px;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.2);max-width:240px}
+  #info button{margin-top:8px;width:100%;padding:8px;background:#4285F4;color:white;border:none;border-radius:8px}
+  #info input{width:100%;padding:8px;margin-top:8px;border-radius:8px;border:1px solid #ddd}
+  #compass{position:fixed;top:10px;right:10px;z-index:1000;width:52px;height:52px;background:white;border-radius:50%;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;font-weight:700}
+  #compass span{color:red}
+  #floors{position:fixed;bottom:10px;left:10px;z-index:1000;display:flex;gap:6px}
+  #floors button{padding:8px 12px;border-radius:12px;border:1px solid #ddd;background:white}
 </style>
 </head>
 <body>
 <div id="info">
   <b>📍 我的位置</b><br>
   <span id="status">按下面按钮开始定位</span><br>
+  <input id="q" placeholder="Search G-085 / The Body Shop">
   <button onclick="startLoc()">开始定位</button>
+  <button onclick="toggleEdit()" style="background:#ffaa00">头像修正 ON/OFF</button>
+</div>
+<div id="compass" onclick="resetNorth()"><span>▲</span>&nbsp;N</div>
+<div id="floors">
+  <button onclick="setFloor('LG')">LG</button>
+  <button onclick="setFloor('G')">G</button>
+  <button onclick="setFloor('1F')">1F</button>
+  <button onclick="setFloor('2F')">2F</button>
 </div>
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  // 先显示 Shah Alam
   var map = L.map('map').setView([3.0738, 101.5183], 15);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  var myMarker = null;
+  // 4 个 GPS 锚点，对应你 anchors.csv
+  // 左上 3.0735,101.6065  右上 3.0735,101.6095
+  // 左下 3.0715,101.6065  右下 3.0715,101.6095
+  var bounds = [[3.0715, 101.6065], [3.0735, 101.6095]];
+  var overlay = L.imageOverlay('map-G.png', bounds).addTo(map);
+  map.fitBounds(bounds);
 
+  var shops = [
+    {lot:"G(E)-016",shop:"MAYBANK",lat:3.0729,lng:101.6070},
+    {lot:"G-085",shop:"The Body Shop",lat:3.0723,lng:101.6078},
+    {lot:"G-089-091",shop:"Zara",lat:3.0721,lng:101.6080},
+    {lot:"G-082",shop:"Sephora",lat:3.0724,lng:101.6077},
+    {lot:"G-096",shop:"CHANEL",lat:3.0720,lng:101.6082},
+    {lot:"G-001",shop:"TESLA",lat:3.0724,lng:101.6068},
+  ];
+  var markers = [];
+  var editMode = false;
+  function render(filter=""){
+    markers.forEach(m=>map.removeLayer(m)); markers=[];
+    shops.filter(s=>(s.shop+s.lot).toLowerCase().includes(filter.toLowerCase()))
+    .forEach(s=>{
+      var m = L.marker([s.lat,s.lng]).addTo(map).bindPopup(s.shop+" "+s.lot);
+      m.on('click',()=>{ if(editMode){ var nlat=prompt('新 lat',s.lat); var nlng=prompt('新 lng',s.lng); if(nlat) s.lat=+nlat; if(nlng) s.lng=+nlng; render(q.value); alert('已修正，记得存回 Shop.csv'); }});
+      markers.push(m);
+    });
+  }
+  render();
+  q.oninput=e=>render(e.target.value);
+  function toggleEdit(){ editMode=!editMode; alert(editMode?'修正模式 ON：点店改 lat/lng':'修正模式 OFF'); }
+
+  var myMarker = null;
   function startLoc(){
     document.getElementById('status').innerText = "正在找你...请允许定位";
-    if(!navigator.geolocation){
-      document.getElementById('status').innerText = "你的手机不支持定位";
-      return;
-    }
+    if(!navigator.geolocation){ document.getElementById('status').innerText="你的手机不支持定位"; return; }
     navigator.geolocation.watchPosition(function(pos){
-      var lat = pos.coords.latitude;
-      var lng = pos.coords.longitude;
-      document.getElementById('status').innerText = "找到你了！\n" + lat.toFixed(5) + ", " + lng.toFixed(5);
-      if(myMarker == null){
-        myMarker = L.marker([lat, lng]).addTo(map);
-        map.setView([lat, lng], 17);
-      } else {
-        myMarker.setLatLng([lat, lng]);
-        map.setView([lat, lng]);
-      }
-    }, function(err){
-      document.getElementById('status').innerText = "定位失败: " + err.message;
-    }, { enableHighAccuracy: true });
+      var lat=pos.coords.latitude, lng=pos.coords.longitude;
+      document.getElementById('status').innerText="找到你了！\n"+lat.toFixed(5)+", "+lng.toFixed(5);
+      if(myMarker==null){ myMarker=L.marker([lat,lng]).addTo(map); map.setView([lat,lng],17); }
+      else{ myMarker.setLatLng([lat,lng]); map.setView([lat,lng]); }
+    }, function(err){ document.getElementById('status').innerText="定位失败: "+err.message; }, {enableHighAccuracy:true});
   }
+
+  // 指南针会动
+  if(window.DeviceOrientationEvent){
+    addEventListener('deviceorientation',e=>{
+      if(e.alpha!=null){ document.getElementById('compass').style.transform=`rotate(${-e.alpha}deg)`; }
+    });
+  }
+  function resetNorth(){ map.setView([3.0725,101.6080],17); document.getElementById('compass').style.transform='rotate(0deg)'; }
+  function setFloor(f){ overlay.setUrl('map-'+f+'.png'); alert('切换到 '+f); }
 </script>
 </body>
-  </html>
+</html>
