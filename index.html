@@ -9,7 +9,6 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#000;overflow:hidden;position:fixed;width:100%;height:100%}
 #mapWrap{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;background:#000;touch-action:none;display:flex;align-items:center;justify-content:center}
 #mapInner{position:relative;width:100vw;height:100dvh;transform-origin:center center;will-change:transform;display:flex;align-items:center;justify-content:center}
-/* 这张图本身就是竖的、北朝上，所以用 contain，不要 cover，不要转 */
 #mapImg{max-width:100vw;max-height:100dvh;width:auto;height:100dvh;object-fit:contain;display:block}
 #pin{position:absolute;z-index:10;display:none;transform:translate(-50%,-100%);text-align:center;pointer-events:none}
 #pin .pinIcon{font-size:38px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
@@ -31,9 +30,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 #floorWrap{position:relative}
 #floorBtn{width:46px;height:56px;border-radius:12px;border:0;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);font-weight:800;font-size:14px}
 #floorBtn small{display:block;font-size:9px;font-weight:400;color:#666}
-#floorList{position:absolute;right:0;top:62px;background:#fff;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,.25);overflow:hidden;display:none;min-width:52px}
-#floorList button{display:block;width:100%;padding:12px 0;border:0;background:#fff;font-size:14px;font-weight:600}
-#floorList button.active{background:#1a73e8;color:#fff}
+/* 改成弹窗卡片 */
+#floorList{position:absolute;right:0;top:62px;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,.25);overflow:hidden;display:none;width:210px;padding:12px}
+#floorList .fTitle{font-size:15px;font-weight:800}
+#floorList .fSub{font-size:12px;color:#666;margin:2px 0 8px}
+#floorList .fRow{display:flex;justify-content:space-between;align-items:center;width:100%;padding:11px 8px;border:0;background:#fff;font-size:14px;font-weight:600;border-radius:10px;text-align:left}
+#floorList .fRow.active{background:#111;color:#fff}
+#floorList .fRow.active span:last-child{color:#fff}
+#floorConfirm{width:100%;margin-top:10px;padding:11px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800;font-size:14px}
 #aiPanel{position:fixed;left:12px;right:12px;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:30;background:#fff;border-radius:18px;padding:12px;box-shadow:0 8px 30px rgba(0,0,0,.3);display:none}
 #aiPanel.show{display:block}
 #aiHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -63,7 +67,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div id="rightBar">
 <button class="circleBtn" onclick="resetNorth()">🧭</button>
 <button class="circleBtn" onclick="locateMe()">🎯</button>
-<div id="floorWrap"><button id="floorBtn" onclick="toggleFloor()"><span id="floorLabel">G</span><small>楼层</small></button><div id="floorList"><button onclick="setFloor('LG',this)">LG</button><button class="active" onclick="setFloor('G',this)">G</button><button onclick="setFloor('1',this)">1</button><button onclick="setFloor('2',this)">2</button><button onclick="setFloor('3',this)">3</button></div></div>
+<div id="floorWrap"><button id="floorBtn" onclick="toggleFloor()"><span id="floorLabel">G</span><small>楼层</small></button>
+<div id="floorList">
+<div class="fTitle">你现在在哪层？</div>
+<div class="fSub" id="floorSub">已选择 G楼</div>
+<button class="fRow" data-f="3" onclick="pickFloor('3',this)"><span>3 楼</span><span>✓ 我在这</span></button>
+<button class="fRow" data-f="2" onclick="pickFloor('2',this)"><span>2 楼</span><span></span></button>
+<button class="fRow" data-f="1" onclick="pickFloor('1',this)"><span>1 楼</span><span></span></button>
+<button class="fRow active" data-f="G" onclick="pickFloor('G',this)"><span>G 楼</span><span>✓ 我在这</span></button>
+<button class="fRow" data-f="LG" onclick="pickFloor('LG',this)"><span>LG 楼</span><span></span></button>
+<button class="fRow" data-f="P1" onclick="pickFloor('P1',this)"><span>P1</span><span></span></button>
+<button class="fRow" data-f="P2" onclick="pickFloor('P2',this)"><span>P2</span><span></span></button>
+<button id="floorConfirm" onclick="confirmFloor()">确认</button>
+</div></div>
 </div>
 
 <div id="hint">地图已按北朝上校正 • 打 maybank 点 🔍 会 Pin 位置</div>
@@ -71,8 +87,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 <div id="aiPanel"><div id="aiHead"><b>✨ AI 小萌</b><button id="aiClose" onclick="toggleAI(event)">✕</button></div><div id="aiChat">👋 你好，我是小萌！打 maybank，我会在地图上 Pin 给你看。</div><div id="aiInputRow"><input id="aiInput" placeholder="问小萌：maybank 在哪？"><button id="aiSend" onclick="askAI()">发送</button></div></div>
 
 <script>
-// 坐标按你这张竖图重算了：x=左右，y=上下
-// AEON在右上，UNIQLO在右中，H&M在下面，PADINI在最上面
 const SHOPS=[
  {name:'MAYBANK',floor:'G',x:68,y:48,desc:'G楼，东边走廊'},
  {name:'UNIQLO',floor:'G',x:78,y:58,desc:'G楼，右边，Victoria’s Secret 旁边'},
@@ -86,9 +100,10 @@ const SHOPS=[
  {name:'电影',floor:'G',x:70,y:25,desc:'G楼'},
  {name:'奶茶',floor:'G',x:55,y:65,desc:'G楼'},
 ];
-let floor='G',scale=1,tx=0,ty=0,rot=0; // 关键：0，不要再转了
+let floor='G',scale=1,tx=0,ty=0,rot=0;
 let startDist=0,startScale=1,startX=0,startY=0;
 let aiOpen=false;
+let tempFloor='G';
 const inner=document.getElementById('mapInner'),wrap=document.getElementById('mapWrap'),img=document.getElementById('mapImg'),pin=document.getElementById('pin');
 function apply(){inner.style.transform=`translate(${tx}px,${ty}px) rotate(${rot}deg) scale(${scale})`;}
 apply();
@@ -120,10 +135,20 @@ document.getElementById('searchInput').addEventListener('input',e=>{
 });
 function pickShop(name){document.getElementById('searchInput').value=name;document.getElementById('suggest').style.display='none';doSearch();}
 function quick(t,el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('searchInput').value=t;doSearch();}
-function toggleFloor(){const l=document.getElementById('floorList');l.style.display=l.style.display==='block'?'none':'block';}
-function setFloor(f,btn){floor=f;document.getElementById('floorLabel').textContent=f;document.querySelectorAll('#floorList button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.getElementById('floorList').style.display='none';pin.style.display='none';if(f==='G'||f==='LG')img.src=f==='G'?'map-G.png':'map-LG.png';else img.src='map-G.png';resetMap();}
+function toggleFloor(){const l=document.getElementById('floorList');const isOpen=l.style.display==='block';l.style.display=isOpen?'none':'block';if(!isOpen){tempFloor=floor;syncFloorUI();}}
+function pickFloor(f,btn){tempFloor=f;syncFloorUI();}
+function syncFloorUI(){
+ document.querySelectorAll('#floorList .fRow').forEach(b=>{
+   const isActive=b.dataset.f===tempFloor;
+   b.classList.toggle('active',isActive);
+   b.querySelectorAll('span')[1].textContent=isActive?'✓ 我在这':'';
+ });
+ document.getElementById('floorSub').textContent='已选择 '+tempFloor+'楼';
+}
+function confirmFloor(){setFloor(tempFloor,null);}
+function setFloor(f,btn){floor=f;tempFloor=f;document.getElementById('floorLabel').textContent=f;document.getElementById('floorList').style.display='none';pin.style.display='none';syncFloorUI();if(f==='G'||f==='LG')img.src=f==='G'?'map-G.png':'map-LG.png';else img.src='map-G.png';resetMap();}
 function resetMap(){scale=1;tx=0;ty=0;apply();}
-function resetNorth(){rot=0;tx=0;ty=0;scale=1;apply();} // 指南针也是归 0，不是 90
+function resetNorth(){rot=0;tx=0;ty=0;scale=1;apply();}
 function locateMe(){const d=document.getElementById('myDot');d.style.display='block';d.style.left='50%';d.style.top='50%';resetMap();}
 function getDist(e){return Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
 function getMid(e){return {x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};}
