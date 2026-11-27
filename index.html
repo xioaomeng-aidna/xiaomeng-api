@@ -39,4 +39,239 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .sheet.show{display:block}
 .sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff !important;color:#111 !important;margin-top:8px;font-size:16px;cursor:pointer;text-align:left}
 .sheet button.primary{background:#111 !important;color:#fff !important;text-align:center}
-.sheet button.cyan{background:#00d4c5 !important;color:#111 !important;font-weight
+.sheet button.cyan{background:#00d4c5 !important;color:#111 !important;font-weight:800;text-align:center}
+.sheet button.orange{background:#ff9800 !important;color:#fff !important;font-weight:800;text-align:center}
+.sheet input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;background:#f5f5f5;color:#111;outline:none}
+.aiinput{display:flex;gap:8px;margin-top:10px}
+.aiinput input{flex:1}
+.aiinput button{width:70px !important;margin-top:0 !important;background:#111 !important;color:#fff !important;text-align:center !important}
+.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:300;overflow:auto}
+.drawer.show{display:block}
+.navbtn{margin:12px;background:#00d4c5;color:#111;border:0;border-radius:999px;padding:14px;width:calc(100% - 24px);font-weight:800;font-size:16px;cursor:pointer;position:relative;z-index:240}
+.navbtn:disabled{background:#333;color:#888}
+.badge{position:fixed;left:12px;bottom:80px;background:#111;color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;z-index:240;pointer-events:none}
+.autotag{position:fixed;left:12px;top:130px;background:#ff3b30;color:#fff;border-radius:999px;padding:6px 10px;font-size:11px;z-index:240;display:none;pointer-events:none}
+.entrance{position:absolute;transform:translate(-50%,-50%);background:#00c853;color:#fff;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:800;z-index:5;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;border:2px solid #fff}
+.route{position:absolute;left:15%;top:30%;width:70%;height:120px;border:3px dashed #ff3b30;border-radius:999px;z-index:4;pointer-events:none;display:none}
+.mapChoose{display:flex;gap:10px;margin-top:10px}
+.mapChoose button{flex:1 !important;padding:16px 8px !important;text-align:center !important;border-radius:16px !important}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="row1">
+    <div class="searchbar" id="searchBar">🔍 <span id="pillText">搜 Mid Valley / 店...</span> <small id="pillFloor">G(E)</small></div>
+    <button class="ai" id="aiBtn">✨ AI</button>
+    <div class="avatar" id="avatarBtn">👧</div>
+  </div>
+  <div class="row2" id="facRow">
+    <button class="on" data-f="all">全部</button>
+    <button data-f="entrance">🚪 入口</button>
+    <button data-f="elevator">🛗 Elevator</button>
+    <button data-f="escalator">↗️ Escalator</button>
+    <button data-f="toilet">🚻 Toilet</button>
+    <button data-f="shop">🏬 店</button>
+  </div>
+</div>
+<div class="mapwrap">
+  <div id="gpsMap"></div>
+  <div id="indoorMap"></div>
+  <div class="route" id="routeLine"></div>
+  <div class="pin" id="myPos" style="left:48%;top:68%;background:#ff3b30;color:#fff;display:none">📍 你在这里</div>
+  <div class="mydot" id="myDot" style="left:48%;top:68%"></div>
+  <div id="pinLayer"></div>
+  <div class="badge" id="statusBadge">🗺️ GPS - 点右边最上面白圆换地图</div>
+  <div class="autotag" id="autoTag">🔔 自动检测中...</div>
+</div>
+<div class="righttools">
+  <button class="rbtn mapSwitchBtn" id="mapFab" title="换地图 GPS / 室内">
+    <svg width="32" height="32" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#111" stroke-width="3"/><path d="M10 32 L18 26 L26 32 L38 16" fill="none" stroke="#00c853" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="4" fill="#2f7bff"/><circle cx="34" cy="34" r="4" fill="#ff3b30"/></svg>
+  </button>
+  <button class="rbtn" id="compassBtn" title="指南针"><svg width="34" height="34" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fff"/><polygon points="24,8 28,24 20,24" fill="#ff3b30"/><polygon points="24,40 28,24 20,24" fill="#111"/><text x="24" y="18" font-size="9" font-weight="900" text-anchor="middle" fill="#ff3b30">N</text><circle cx="24" cy="24" r="3" fill="#fff" stroke="#111"/></svg></button>
+  <button class="rbtn" id="locateBtn" title="定位 - 只回到你"><svg width="32" height="32" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="#2f7bff" stroke-width="4"/><circle cx="24" cy="24" r="6" fill="#2f7bff"/><path d="M24 2v8M24 38v8M2 24h8M38 24h8" stroke="#2f7bff" stroke-width="4" stroke-linecap="round"/></svg></button>
+  <button class="rbtn relocBtn" id="pinBtn" title="重新定位 - 校准我在 G 020">➕</button>
+  <button class="rbtn redpin" id="redPinBtn" title="加标记">📌</button>
+  <button class="rbtn big red" id="floorBtn" title="楼层">G</button>
+  <div class="rlabel" id="floorLabel">未确认</div>
+</div>
+<button class="navbtn" id="navBtn" disabled>先进入室内地图，才能导航</button>
+<div class="sheet" id="mapChooseSheet">
+  <h3>🗺️ 换地图</h3>
+  <p style="color:#666;font-size:13px" id="mapChooseHint">你现在在 GPS 地图，要换去哪里？</p>
+  <div class="mapChoose">
+    <button id="chooseGPS" style="background:#e3f2fd !important;border:2px solid #2f7bff !important"><b>🗺️ GPS</b><br><small>外面大地图<br>看路 / 定位到你</small></button>
+    <button id="chooseIndoor" style="background:#fff3e0 !important;border:2px solid #ff9800 !important"><b>🏬 室内 <span id="chooseFloor">G</span></b><br><small>室内平面图<br>看入口 / 店在几楼</small></button>
+  </div>
+  <button class="orange" id="chooseBrowse">👀 只是看看室内 - 不在附近也能看</button>
+  <button id="closeMapChoose">取消</button>
+</div>
+<div class="sheet" id="searchSheet"><h3>🔍 搜索</h3><input id="searchInput" placeholder="搜 MAYBANK / Sunway pyramid / Mid Valley..." value=""><div style="display:flex;gap:8px;margin-top:8px"><button id="searchGoBtn" class="primary" style="flex:1">🔍 搜这个地方</button></div><div id="searchResults"></div><button id="closeSearchBtn">关闭</button></div>
+<div class="sheet" id="browseSheet"><h3>👀 浏览模式 - 只是看看</h3><p style="color:#666;font-size:13px">你不在 Mall 500 米内，GPS 不带你，你可以自己拖着看。</p><button onclick="showShop('MAYBANK','G楼','东入口','从东入口进，直走 50 米，左手边')">🏦 MAYBANK - G楼 · 东入口最近</button><button onclick="showShop('AEON','G楼','西入口','从西入口进，直走 80 米')">🛒 AEON - G楼 · 西入口最近</button><button onclick="showShop('厕所','G楼','地铁入口','从地铁入口上 G楼，右手边')">🚻 厕所 - G楼 · 地铁入口最近</button><button onclick="showShop('停车场','LG楼','北入口','从北入口进，下 LG')">🅿️ 停车场 - LG楼 · 北入口最近</button><button class="primary" id="closeBrowseBtn">我看懂了，关掉</button></div>
+<div class="sheet" id="shopSheet"><h3 id="shopTitle">🏦 MAYBANK</h3><p id="shopDetail" style="background:#f5f5f5;border-radius:12px;padding:12px">G楼 · 从东入口进</p><button class="cyan" id="shopNavBtn">🧭 我到了，开始导航去这里</button><button id="closeShopBtn">继续看看</button></div>
+<div class="sheet" id="startNavSheet"><h3>🧭 开始导航？</h3><p>你已在室内地图，XY 网已对齐，要开始带你去 <b>G 020</b> 吗？</p><button class="cyan" id="startNavYesBtn">是 ✓ 开始带</button><button id="startNavNoBtn">先逛逛</button></div>
+<div class="sheet" id="floorSheet"><h3>🔔 请确认楼层 <span style="font-size:12px;color:#ff3b30">自动弹出</span></h3><p id="floorReason">系统自动检测到你可能换楼层了，你现在在 <b id="selFloor">G楼</b> 吗？</p><p id="floorDetail" style="background:#fff3cd;border-radius:8px;padding:8px;font-size:13px;color:#666">原因：走了 10 米</p><button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button><button class="cyan" id="confirmFloorBtn">确认 ✓ 我在这一层</button><button id="closeFloorBtn">我没换楼，继续</button></div>
+<div class="sheet" id="relocSheet"><h3>🔄 重新定位</h3><input id="manualLoc" placeholder="例如 G 020" value="G 020"><button class="primary" id="confirmRelocBtn">校准 ✓ 我在 G 020</button><button id="closeRelocBtn">取消</button></div>
+<div class="sheet" id="pinSheet"><h3>📌 手动加 Marking</h3><input id="pinText" placeholder="例如：停车位" value="我的标记"><button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button><button id="closePinBtn">取消</button></div>
+<div class="sheet" id="aiSheet"><h3>✨ 问小萌 - Gemini</h3><p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，直接打字问我，我用 Gemini 回答你。</p><div class="aiinput"><input id="aiInput" placeholder="自己打字：例如 厕所在哪里？"><button id="aiSend">发送</button></div><button class="primary" id="closeAIBtn">关闭</button></div>
+<div class="drawer" id="drawer"><h3>👧 我的小萌</h3><div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0"><b>📍 我的足迹</b><br><span id="trackList">未确认楼层</span></div><button id="closeDrawerBtn" style="width:100%;padding:12px;border-radius:12px;background:#111;color:#fff;border:0">关闭</button></div>
+<script>
+let cur='G', confirmed=false, manual='G 020', inIndoor=false, navigating=false, browseMode=false;
+let lastPos=null, walked=0, lastFloorCheck=Date.now(), floorPopupOpen=false, lastAlt=null, gpsLostAt=0, myLat=null, myLng=null, targetShop='MAYBANK';
+const MV={lat:3.1175,lng:101.6772};
+const PLACES={ 'mid valley':[3.1175,101.6772], 'sunway pyramid':[3.0730,101.6070], 'sunway':[3.0730,101.6070], 'pavilion':[3.1490,101.7130], 'klcc':[3.1570,101.7110] };
+const FACILITIES=[{name:'🛗 电梯', lat:3.1174, lng:101.6770},{name:'↗️ 电扶梯', lat:3.1176, lng:101.6774}];
+function show(id){document.getElementById(id).classList.add('show')}
+function hide(id){document.getElementById(id).classList.remove('show')}
+function hideAll(){['floorSheet','relocSheet','pinSheet','aiSheet','searchSheet','startNavSheet','browseSheet','shopSheet','mapChooseSheet'].forEach(hide)}
+function distM(a,b,c,d){let R=6371000,dx=(c-a)*Math.PI/180,dy=(d-b)*Math.PI/180;let h=Math.sin(dx/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dy/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function setBadge(t){document.getElementById('statusBadge').innerText=t}
+let gpsMap=L.map('gpsMap',{zoomControl:true}).setView([MV.lat,MV.lng],16);
+let osmLayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19, attribution:'© OpenStreetMap'}).addTo(gpsMap);
+let fallbackDone=false;
+osmLayer.on('tileerror', ()=>{
+  if(fallbackDone) return; fallbackDone=true;
+  try{ gpsMap.removeLayer(osmLayer); }catch(e){}
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19, attribution:'© CARTO'}).addTo(gpsMap);
+});
+L.marker([MV.lat,MV.lng]).addTo(gpsMap).bindPopup('📍 Mid Valley Megamall');
+let meMarker=null, meCircle=null;
+function rotateGPS(deg){ document.getElementById('gpsMap').style.transform='rotate('+deg+'deg)'; }
+function updateFab(){
+  let fab=document.getElementById('mapFab');
+  document.getElementById('chooseFloor').innerText=cur;
+  if(inIndoor){ fab.classList.add('indoorOn'); document.getElementById('mapChooseHint').innerText='你现在在室内 '+cur+'楼，要换去哪里？'; }
+  else { fab.classList.remove('indoorOn'); document.getElementById('mapChooseHint').innerText='你现在在 GPS 地图，要换去哪里？'; }
+}
+function switchToGPS(){
+  inIndoor=false; browseMode=false;
+  document.getElementById('gpsMap').style.display='block';
+  document.getElementById('indoorMap').style.display='none';
+  document.getElementById('routeLine').style.display='none';
+  setTimeout(()=>{ gpsMap.invalidateSize(); gpsMap.setView([myLat||MV.lat, myLng||MV.lng],16); },200);
+  setBadge('🗺️ GPS 地图 · 点右边最上面白圆换地图 · 点 🎯 只回到你');
+  document.getElementById('navBtn').disabled=true; document.getElementById('navBtn').innerText='先进入室内地图，才能导航';
+  updateFab();
+}
+function switchToIndoor(){
+  let d=null; if(myLat) d=Math.round(distM(myLat,myLng,MV.lat,MV.lng));
+  if(d!==null && d>500){ enterBrowseMode(); return; }
+  if(d===null){ enterBrowseMode(); return; }
+  enterIndoor();
+}
+document.getElementById('mapFab').addEventListener('click',()=>{ show('mapChooseSheet'); });
+document.getElementById('chooseGPS').addEventListener('click',()=>{ hide('mapChooseSheet'); switchToGPS(); });
+document.getElementById('chooseIndoor').addEventListener('click',()=>{ hide('mapChooseSheet'); switchToIndoor(); });
+document.getElementById('chooseBrowse').addEventListener('click',()=>{ hide('mapChooseSheet'); enterBrowseMode(); });
+document.getElementById('closeMapChoose').addEventListener('click',()=>hide('mapChooseSheet'));
+function loadGPSPlace(q, zoom=16){
+  let key=q.toLowerCase().trim(); let ll=PLACES[key]||null; hide('searchSheet');
+  if(ll){ gpsMap.setView(ll, zoom); L.marker(ll).addTo(gpsMap).bindPopup('📍 '+q).openPopup(); }
+  else { fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q)+'&limit=1').then(r=>r.json()).then(d=>{ if(d.length){ let la=parseFloat(d[0].lat), lo=parseFloat(d[0].lon); gpsMap.setView([la,lo],16); L.marker([la,lo]).addTo(gpsMap).bindPopup('📍 '+d[0].display_name).openPopup(); } }).catch(()=>{}); }
+  switchToGPS(); setBadge('🗺️ GPS - '+q+' · 点右边最上面白圆换室内'); document.getElementById('pillText').innerText=q;
+}
+function enterBrowseMode(){
+  browseMode=true; inIndoor=true; navigating=false;
+  let m=document.getElementById('indoorMap'); m.style.display='block';
+  document.getElementById('gpsMap').style.display='none';
+  m.innerHTML='<div class="entrance" style="left:50%;top:8%" onclick="showShop(\'东入口\',\'G楼\',\'东入口\',\'这里是东入口\')">🚪 东入口</div>'
+  +'<div class="entrance" style="left:8%;top:50%" onclick="showShop(\'西入口\',\'G楼\',\'西入口\',\'这里是西入口\')">🚪 西入口</div>'
+  +'<div class="entrance" style="left:50%;top:92%" onclick="showShop(\'地铁入口\',\'LG楼\',\'地铁入口\',\'地铁站出来就是这里\')">🚇 地铁入口</div>'
+  +'<div class="pin" style="left:48%;top:48%;background:#ff3b30;color:#fff">🏦 MAYBANK · G楼</div>'
+  +'<div class="pin blue" style="left:25%;top:65%">🛒 AEON · G楼</div>'
+  +'<div class="pin" style="left:75%;top:55%">🚻 厕所 · G楼</div>';
+  setBadge('👀 浏览模式 · 点右边最上面白圆回 GPS');
+  document.getElementById('navBtn').disabled=false; document.getElementById('navBtn').innerText='👀 浏览中 · 点店，看从哪个入口进最近';
+  document.getElementById('myDot').style.display='none'; updateFab(); show('browseSheet');
+}
+function enterIndoor(){
+  browseMode=false; inIndoor=true;
+  document.getElementById('gpsMap').style.display='none';
+  let m=document.getElementById('indoorMap'); m.style.display='block'; m.innerHTML='';
+  document.getElementById('myDot').style.display='block'; document.getElementById('myPos').style.display='block';
+  setBadge('🏬 室内地图 '+cur+'楼 · 点右边最上面白圆回 GPS');
+  let nav=document.getElementById('navBtn'); nav.disabled=false; nav.innerText='开始导航 → 去 '+manual; updateFab(); show('startNavSheet');
+}
+function showShop(name, floor, entrance, detail){
+  targetShop=name; manual=name;
+  document.getElementById('shopTitle').innerText='🏬 '+name;
+  document.getElementById('shopDetail').innerHTML='<b>'+floor+'</b> · 从 <b>'+entrance+'</b> 进最近<br>'+detail;
+  document.getElementById('routeLine').style.display='block';
+  document.getElementById('pillText').innerText=name+' · '+floor;
+  hide('browseSheet'); show('shopSheet');
+}
+function locateToMe(){
+  setBadge('📍 正在找你的位置...');
+  if(!navigator.geolocation){ setBadge('📍 浏览器不给 GPS 权限'); alert('请开手机 GPS + 浏览器定位权限'); return; }
+  navigator.geolocation.getCurrentPosition(p=>{
+    myLat=p.coords.latitude; myLng=p.coords.longitude;
+    let d=Math.round(distM(myLat,myLng,MV.lat,MV.lng));
+    if(!inIndoor){
+      gpsMap.setView([myLat,myLng],17); rotateGPS(0);
+      if(meMarker) gpsMap.removeLayer(meMarker); if(meCircle) gpsMap.removeLayer(meCircle);
+      meMarker=L.marker([myLat,myLng]).addTo(gpsMap).bindPopup('📍 你在这里').openPopup();
+      meCircle=L.circle([myLat,myLng],{radius:p.coords.accuracy||30,color:'#2f7bff',fillOpacity:0.15}).addTo(gpsMap);
+      setTimeout(()=>gpsMap.invalidateSize(),200);
+      setBadge('📍 已指到你 · 距 Mid Valley '+d+' 米 · 想进室内，点右边最上面白圆');
+    } else {
+      document.getElementById('myDot').style.display='block'; document.getElementById('myPos').style.display='block';
+      document.getElementById('myPos').innerText='📍 你在这里 · '+cur+'楼 · 距 Mid Valley '+d+' 米';
+      setBadge('📍 室内已回到你 · '+cur+'楼 · 想回 GPS，点右边最上面白圆');
+    }
+    document.getElementById('pillText').innerText='📍 你在这里 · 距 Mid Valley '+d+' 米';
+  }, err=>{ setBadge('📍 拿不到你的位置：'+err.message); alert('拿不到你的位置，请开 GPS'); }, {enableHighAccuracy:true, timeout:8000});
+}
+function doSearch(){
+  let raw=document.getElementById('searchInput').value.trim(); let q=raw.toLowerCase();
+  let box=document.getElementById('searchResults'); box.innerHTML='';
+  if(!raw){ box.innerHTML='<p style="color:#888">打 MAYBANK / Sunway pyramid / Mid Valley 试试</p>'; return; }
+  let list=[];
+  if(q.includes('mid')||q.includes('valley')) list=[{t:'📍 Mid Valley Megamall - GPS',s:'GPS 真地图',type:'gps',query:'Mid Valley Megamall Kuala Lumpur'},{t:'👀 浏览 Mid Valley 室内地图',s:'不在附近也能看',type:'browse',query:'Mid Valley'},{t:'🧭 进入 Mid Valley 室内导航',s:'我在附近，500米内',type:'indoor',query:'Mid Valley'}];
+  else if(q.includes('maybank')) list=[{t:'🏦 MAYBANK - G楼 · 东入口最近',s:'点它，看从哪个入口进',type:'shop',query:'MAYBANK'}];
+  else if(q.includes('sunway')) list=[{t:'📍 Sunway Pyramid - GPS',s:'点它，GPS 跳到 Sunway Pyramid',type:'gps',query:'Sunway Pyramid'}];
+  else list=[{t:'📍 '+raw+' - GPS 真地图',s:'点它，GPS 跳到 '+raw, type:'gps', query:raw},{t:'👀 浏览 Mid Valley 室内地图',s:'不在附近也能看',type:'browse',query:'Mid Valley'}];
+  list.forEach(it=>{
+    let b=document.createElement('button'); b.innerHTML='<b>'+it.t+'</b><br><small style="color:#666">'+it.s+'</small>';
+    b.onclick=()=>{ hide('searchSheet'); if(it.type==='indoor') enterIndoor(); else if(it.type==='browse') enterBrowseMode(); else if(it.type==='shop'){ enterBrowseMode(); setTimeout(()=>showShop(it.query,'G楼','东入口','从东入口进最近'),300); } else loadGPSPlace(it.query); };
+    box.appendChild(b);
+  });
+}
+document.getElementById('searchBar').addEventListener('click',()=>{show('searchSheet');doSearch()});
+document.getElementById('searchInput').addEventListener('input',doSearch);
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('searchGoBtn').click()}});
+document.getElementById('searchGoBtn').addEventListener('click',()=>{let v=document.getElementById('searchInput').value.trim(); if(!v) return; hide('searchSheet'); loadGPSPlace(v);});
+document.getElementById('closeSearchBtn').addEventListener('click',()=>hide('searchSheet'));
+document.getElementById('closeBrowseBtn').addEventListener('click',()=>hide('browseSheet'));
+document.getElementById('closeShopBtn').addEventListener('click',()=>hide('shopSheet'));
+document.getElementById('shopNavBtn').addEventListener('click',()=>{hide('shopSheet'); if(browseMode) alert('你还在浏览模式，到了 Mall 500 米内，点右边最上面白圆进导航'); else show('startNavSheet');});
+let audioCtx=null;
+function playAlertSound(){try{if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended') audioCtx.resume();[880,660,880].forEach((f,i)=>{let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0.0001,audioCtx.currentTime+i*0.25);g.gain.exponentialRampToValueAtTime(0.3,audioCtx.currentTime+i*0.25+0.02);g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+i*0.25+0.22);o.connect(g);g.connect(audioCtx.destination);o.start(audioCtx.currentTime+i*0.25);o.stop(audioCtx.currentTime+i*0.25+0.25);});}catch(e){} if(navigator.vibrate) navigator.vibrate([200,100,200,100,300]);}
+function autoFloorPopup(reason, detail){ if(!inIndoor||!navigating||floorPopupOpen||browseMode) return; floorPopupOpen=true; document.getElementById('floorReason').innerHTML=reason+'，你现在在 <b>'+cur+'楼</b> 吗？'; document.getElementById('floorDetail').innerText='原因：'+detail; playAlertSound(); document.getElementById('autoTag').style.display='block'; show('floorSheet');}
+if(navigator.geolocation){ navigator.geolocation.watchPosition(p=>{let lat=p.coords.latitude,lng=p.coords.longitude,alt=p.coords.altitude;gpsLostAt=0;if(lastPos){let d=distM(lastPos.lat,lastPos.lng,lat,lng);if(d>0.5&&d<50){walked+=d;if(inIndoor&&!browseMode) setBadge('🧭 导航中 · 已走 '+Math.round(walked)+' 米');if(walked>=10){autoFloorPopup('你走了 '+Math.round(walked)+' 米','走了 10 米');walked=0;}}FACILITIES.forEach(f=>{let fd=distM(lat,lng,f.lat,f.lng);if(fd<15&&Date.now()-lastFloorCheck>30000){lastFloorCheck=Date.now();autoFloorPopup('你靠近 '+f.name,'靠近 '+f.name);}});}lastPos={lat,lng};if(alt!=null)lastAlt=alt;},{enableHighAccuracy:true,maximumAge:1000,timeout:5000});}
+document.getElementById('locateBtn').addEventListener('click',()=>locateToMe());
+document.getElementById('startNavYesBtn').addEventListener('click',()=>{navigating=true;hide('startNavSheet');setBadge('🧭 导航中 · 自动检测楼层开着');});
+document.getElementById('startNavNoBtn').addEventListener('click',()=>hide('startNavSheet'));
+document.getElementById('aiBtn').addEventListener('click',()=>{hide('drawer');show('aiSheet')});
+document.getElementById('closeAIBtn').addEventListener('click',()=>hide('aiSheet'));
+async function askAI(q){document.getElementById('aiReply').innerText='小萌正在问 Gemini...';try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur,shop_nearby:manual})});let d=await r.json();document.getElementById('aiReply').innerText=d.reply||('Gemini 出错了');}catch(e){document.getElementById('aiReply').innerText='连不到 /api/chat：'+e.message}}
+document.getElementById('aiSend').addEventListener('click',()=>{let v=document.getElementById('aiInput').value.trim();if(!v) return;askAI(v);document.getElementById('aiInput').value=''});
+document.getElementById('avatarBtn').addEventListener('click',()=>{hideAll();show('drawer')});
+document.getElementById('closeDrawerBtn').addEventListener('click',()=>hide('drawer'));
+document.getElementById('compassBtn').addEventListener('click',()=>{ if(!inIndoor){ rotateGPS(0); if(myLat) gpsMap.setView([myLat,myLng],17); else gpsMap.setView([MV.lat,MV.lng],16); setBadge('🧭 已指北 · 回到你 / Mid Valley'); } else { document.getElementById('indoorMap').style.transform='perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25)'; }});
+document.getElementById('pinBtn').addEventListener('click',()=>show('relocSheet'));
+document.getElementById('redPinBtn').addEventListener('click',()=>show('pinSheet'));
+document.getElementById('closePinBtn').addEventListener('click',()=>hide('pinSheet'));
+document.getElementById('confirmPinBtn').addEventListener('click',()=>{let t=document.getElementById('pinText').value.trim()||'我的标记';let d=document.createElement('div');d.className='pin';d.style.left='50%';d.style.top='50%';d.style.background='#ff3b30';d.style.color='#fff';d.innerText='📌 '+t;document.getElementById('pinLayer').appendChild(d);hide('pinSheet')});
+document.getElementById('closeRelocBtn').addEventListener('click',()=>hide('relocSheet'));
+document.getElementById('confirmRelocBtn').addEventListener('click',()=>{manual=document.getElementById('manualLoc').value.trim()||'G 020';document.getElementById('pillText').innerText=manual;hide('relocSheet')});
+document.getElementById('floorBtn').addEventListener('click',()=>show('floorSheet'));
+document.getElementById('closeFloorBtn').addEventListener('click',()=>{floorPopupOpen=false;hide('floorSheet');document.getElementById('autoTag').style.display='none'});
+document.querySelectorAll('#floorSheet [data-floor]').forEach(b=>b.addEventListener('click',()=>{cur=b.dataset.floor;document.getElementById('selFloor').innerText=cur+'楼';updateFab();}));
+document.getElementById('confirmFloorBtn').addEventListener('click',()=>{confirmed=true;floorPopupOpen=false;let fb=document.getElementById('floorBtn');fb.innerText=cur;fb.classList.remove('red');fb.classList.add('cyan');document.getElementById('floorLabel').innerText='已确认';document.getElementById('pillFloor').innerText=cur+'(E)';hide('floorSheet');document.getElementById('autoTag').style.display='none';setBadge('🏬 室内 '+cur+'楼 已确认');updateFab();});
+document.getElementById('navBtn').addEventListener('click',()=>{if(browseMode){show('browseSheet');return} if(!inIndoor){show('mapChooseSheet');return} show('startNavSheet')});
+document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
+setTimeout(()=>{ gpsMap.invalidateSize(); gpsMap.setView([MV.lat,MV.lng],16); },300);
+setTimeout(()=>{ gpsMap.invalidateSize(); },1000);
+updateFab();
+</script>
+</body>
+                                                                                                                                                             </html>
