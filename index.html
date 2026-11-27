@@ -7,12 +7,12 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;background:#0b0f14;color:#fff;overflow:hidden}
-.top{padding:12px 12px 8px;background:#10161d;position:relative;z-index:50}
+.top{padding:12px 12px 8px;background:#10161d;position:relative;z-index:200}
 .row1{display:flex;align-items:center;gap:8px}
 .pill{flex:1;background:#fff;color:#111;border-radius:999px;padding:10px 12px;display:flex;align-items:center;gap:6px;font-weight:700}
 .pill small{color:#666;font-weight:400}
 .ai{background:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
-.avatar{width:40px;height:40px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;cursor:pointer}
+.avatar{width:40px;height:40px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;cursor:pointer;position:relative;z-index:201}
 .row2{display:flex;gap:8px;margin-top:10px;overflow:auto}
 .row2 button{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#1e2a36;color:#fff;cursor:pointer}
 .row2 button.on{background:#fff;color:#111;font-weight:800}
@@ -26,13 +26,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .righttools{position:fixed;right:12px;top:150px;z-index:90;display:flex;flex-direction:column;gap:12px;align-items:center}
 .rbtn{width:56px;height:56px;border-radius:16px;background:#fff;color:#111;border:0;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .rbtn.black{background:#111;color:#fff;border-radius:999px;width:72px;height:56px}
-.rbtn.redpin{background:#ff3b30;color:#fff;border-radius:999px;width:72px;height:56px}
+.rbtn.redpin{background:#fff;color:#111;border-radius:999px;width:72px;height:56px;font-size:30px}
 .rbtn.big{width:72px;height:72px;border-radius:20px;font-size:48px;font-weight:900}
 .rbtn.red{border:3px solid #ff3b30}
 .rbtn.cyan{border:3px solid #00d4c5;background:#e0fffc}
 .rlabel{font-size:11px;color:#fff;background:rgba(0,0,0,.7);border-radius:999px;padding:2px 8px;margin-top:-8px}
-.relocbtn{position:fixed;left:12px;bottom:80px;z-index:90;background:#111;color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.4)}
-.sheet{position:fixed;inset:auto 0 0 0;background:#fff !important;color:#111 !important;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:100;max-height:75vh;overflow:auto;color-scheme:light}
+.sheet{position:fixed;inset:auto 0 0 0;background:#fff !important;color:#111 !important;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:100;max-height:70vh;overflow:auto;color-scheme:light}
 .sheet.show{display:block}
 .sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff !important;color:#111 !important;margin-top:8px;font-size:16px;cursor:pointer}
 .sheet button.primary{background:#111 !important;color:#fff !important}
@@ -41,7 +40,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .aiinput{display:flex;gap:8px;margin-top:10px}
 .aiinput input{flex:1}
 .aiinput button{width:70px !important;margin-top:0 !important;background:#111 !important;color:#fff !important}
-.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:100;overflow:auto}
+.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:300;overflow:auto;box-shadow:-4px 0 20px rgba(0,0,0,.3)}
+.drawer.show{display:block}
 .navbtn{margin:12px;background:#00d4c5;color:#111;border:0;border-radius:999px;padding:14px;width:calc(100% - 24px);font-weight:800;font-size:16px;cursor:pointer}
 .navbtn:disabled{background:#333;color:#888}
 </style>
@@ -61,7 +61,6 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
     <button data-f="exit">🚪 Emergency Exit</button>
   </div>
 </div>
-
 <div class="mapwrap">
   <div class="map" id="map"></div>
   <div class="pin" style="left:58%;top:32%" data-type="elevator">🛗 电梯</div>
@@ -72,107 +71,56 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
   <div class="mydot" id="myDot" style="left:48%;top:68%"></div>
   <div id="pinLayer"></div>
 </div>
-
 <div class="righttools">
   <button class="rbtn" id="compassBtn"><svg width="34" height="34" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fff"/><polygon points="24,8 28,24 20,24" fill="#ff3b30"/><polygon points="24,40 28,24 20,24" fill="#111"/><text x="24" y="18" font-size="9" font-weight="900" text-anchor="middle" fill="#ff3b30">N</text><circle cx="24" cy="24" r="3" fill="#fff" stroke="#111"/></svg></button>
   <button class="rbtn" id="locateBtn"><svg width="32" height="32" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="#2f7bff" stroke-width="4"/><circle cx="24" cy="24" r="6" fill="#2f7bff"/><path d="M24 2v8M24 38v8M2 24h8M38 24h8" stroke="#2f7bff" stroke-width="4" stroke-linecap="round"/></svg></button>
-  <!-- 黑 Pin：黑椭圆 + 白 Pin 外框 + 黑圆 + 白 +，+ 加大了 -->
-  <button class="rbtn black" id="pinBtn">
-    <svg width="48" height="38" viewBox="0 0 72 56">
-      <rect x="2" y="2" width="68" height="52" rx="26" fill="#111"/>
-      <path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/>
-      <circle cx="36" cy="22" r="12" fill="#111"/>
-      <path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-    </svg>
-  </button>
-  <button class="rbtn redpin" id="redPinBtn">
-    <svg width="48" height="38" viewBox="0 0 72 56">
-      <rect x="2" y="2" width="68" height="52" rx="26" fill="#ff3b30"/>
-      <path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/>
-      <circle cx="36" cy="22" r="12" fill="#ff3b30"/>
-      <path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-    </svg>
-  </button>
+  <!-- 黑 Pin：点它 = 重新定位 / 手动定位，就像你第二张图箭头那样 -->
+  <button class="rbtn black" id="pinBtn"><svg width="48" height="38" viewBox="0 0 72 56"><rect x="2" y="2" width="68" height="52" rx="26" fill="#111"/><path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/><circle cx="36" cy="22" r="12" fill="#111"/><path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></button>
+  <!-- 红色那个换成 📌，点它 = 在地图加 marking -->
+  <button class="rbtn redpin" id="redPinBtn">📌</button>
   <button class="rbtn big red" id="floorBtn">G</button>
   <div class="rlabel" id="floorLabel">未确认</div>
 </div>
-<button class="relocbtn" id="relocBtn">🔄 重新定位</button>
-
+<!-- 左下角重新定位已经删了 -->
 <button class="navbtn" id="navBtn" disabled>先确认楼层，才能开始导航</button>
-
-<div class="sheet" id="floorSheet">
-  <h3>确认楼层</h3><p>你现在在 <b id="selFloor">G楼</b> 吗？</p>
-  <button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button>
-  <button class="cyan" id="confirmFloorBtn">确认 ✓ 我在这一层</button>
-  <button id="closeFloorBtn">取消</button>
-</div>
-<div class="sheet" id="relocSheet">
-  <h3>🔄 重新定位</h3>
-  <input id="manualLoc" placeholder="例如 G 020" value="G 020">
-  <button class="primary" id="confirmRelocBtn">校准 ✓ 我在 G 020</button>
-  <button id="closeRelocBtn">取消</button>
-</div>
-<div class="sheet" id="pinSheet">
-  <h3>📌 手动加 Marking</h3>
-  <input id="pinText" placeholder="例如：停车位" value="我的标记">
-  <button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button>
-  <button id="closePinBtn">取消</button>
-</div>
-
-<!-- AI 修好了 -->
+<div class="sheet" id="floorSheet"><h3>确认楼层</h3><p>你现在在 <b id="selFloor">G楼</b> 吗？</p><button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button><button class="cyan" id="confirmFloorBtn">确认 ✓ 我在这一层</button><button id="closeFloorBtn">取消</button></div>
+<div class="sheet" id="relocSheet"><h3>🔄 重新定位</h3><p style="color:#666;font-size:14px">走到乱了？站在店门口，输入店号校准</p><input id="manualLoc" placeholder="例如 G 020" value="G 020"><button class="primary" id="confirmRelocBtn">校准 ✓ 我在 G 020</button><button id="closeRelocBtn">取消</button></div>
+<div class="sheet" id="pinSheet"><h3>📌 手动加 Marking</h3><input id="pinText" placeholder="例如：停车位" value="我的标记"><button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button><button id="closePinBtn">取消</button></div>
 <div class="sheet" id="aiSheet">
-  <h3>✨ 问小萌</h3>
-  <p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，你要去哪里？点下面，或者自己打字问我。</p>
+  <h3>✨ 问小萌 - Gemini</h3>
+  <p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，直接打字问我，我用 Gemini 回答你。</p>
   <div class="aiinput"><input id="aiInput" placeholder="自己打字：例如 厕所在哪里？"><button id="aiSend">发送</button></div>
-  <button data-q="MAYBANK">MAYBANK 在哪里？</button>
-  <button data-q="厕所">厕所在哪里？</button>
-  <button data-q="电梯">电梯在哪里？</button>
-  <button data-q="电扶梯">电扶梯在哪里？</button>
-  <button data-q="停车场">怎么去停车场？</button>
-  <button data-q="出口">安全出口在哪里？</button>
   <button class="primary" id="closeAIBtn">关闭</button>
 </div>
-
-<div class="drawer" id="drawer">
-  <h3>👧 我的小萌</h3>
-  <div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0"><b>📍 我的足迹</b><br><span id="trackList">未确认楼层</span></div>
-  <button id="closeDrawerBtn" style="width:100%;padding:12px;border-radius:12px;background:#111;color:#fff;border:0">关闭</button>
-</div>
-
+<div class="drawer" id="drawer"><h3>👧 我的小萌</h3><div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0"><b>📍 我的足迹</b><br><span id="trackList">未确认楼层</span></div><button id="closeDrawerBtn" style="width:100%;padding:12px;border-radius:12px;background:#111;color:#fff;border:0">关闭</button></div>
 <script>
 let cur='G', confirmed=false, manual='G 020';
 function show(id){document.getElementById(id).classList.add('show')}
 function hide(id){document.getElementById(id).classList.remove('show')}
+function hideAll(){['floorSheet','relocSheet','pinSheet','aiSheet'].forEach(hide)}
 function addMarking(t){let d=document.createElement('div');d.className='pin mypin';d.style.left='50%';d.style.top='50%';d.style.background='#ff3b30';d.style.color='#fff';d.innerText='📌 '+t;document.getElementById('pinLayer').appendChild(d)}
-// AI 真正的回答，不再写死
-function askAI(q){
-  q=(q||'').toLowerCase();
-  let reply='';
-  if(q.includes('maybank')||q.includes('银行')) reply='MAYBANK 在 '+cur+'楼，东翼，'+cur+'(E)-016，靠近 Elevator';
-  else if(q.includes('厕所')||q.includes('toilet')||q.includes('洗手间')) reply='厕所在 '+cur+'楼，地图右边，白色 pin 那里，跟着箭头走 2 分钟';
-  else if(q.includes('电梯')||q.includes('elevator')) reply='电梯在 '+cur+'楼中间，🛗 电梯 pin 那里';
-  else if(q.includes('电扶梯')||q.includes('escalator')) reply='电扶梯在 '+cur+'楼左边，蓝色 pin 那里';
-  else if(q.includes('停车')||q.includes('parking')) reply='停车场在 LG 楼，从电梯下到 LG 就可以了';
-  else if(q.includes('出口')||q.includes('exit')) reply='安全出口在 '+cur+'楼左边，红色 pin 那里';
-  else if(q.includes('你好')||q.includes('hi')) reply='你好，我是小萌，你要去哪里？';
-  else reply='我在 '+cur+'楼，你现在在 '+manual+' 附近。你可以问我：MAYBANK、厕所、电梯、停车场';
-  document.getElementById('aiReply').innerText=reply;
-  // 同时把小萌的回答也试着发给后端，不成功也不要坏
-  fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur})}).catch(()=>{});
+async function askAI(q){
+  document.getElementById('aiReply').innerText='小萌正在问 Gemini...';
+  try{
+    let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur,shop_nearby:manual})});
+    let d=await r.json();
+    document.getElementById('aiReply').innerText=d.reply||('Gemini 出错了：'+(d.error||JSON.stringify(d)));
+  }catch(e){document.getElementById('aiReply').innerText='连不到 /api/chat：'+e.message}
 }
-document.getElementById('aiBtn').addEventListener('click',()=>show('aiSheet'));
+document.getElementById('aiBtn').addEventListener('click',()=>{hide('drawer');show('aiSheet')});
 document.getElementById('closeAIBtn').addEventListener('click',()=>hide('aiSheet'));
 document.getElementById('aiSend').addEventListener('click',()=>{let v=document.getElementById('aiInput').value.trim();if(!v) return;askAI(v);document.getElementById('aiInput').value=''});
-document.querySelectorAll('#aiSheet [data-q]').forEach(b=>b.addEventListener('click',()=>{askAI(b.dataset.q)}));
-document.getElementById('avatarBtn').addEventListener('click',()=>show('drawer'));
+document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('aiSend').click()}});
+document.getElementById('avatarBtn').addEventListener('click',()=>{hideAll();show('drawer')});
 document.getElementById('closeDrawerBtn').addEventListener('click',()=>hide('drawer'));
 document.getElementById('compassBtn').addEventListener('click',()=>{document.getElementById('map').style.transform='perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25)'});
 document.getElementById('locateBtn').addEventListener('click',()=>{document.getElementById('myDot').style.display='block';document.getElementById('myPos').style.display='block';document.getElementById('myPos').innerText='📍 '+manual});
-document.getElementById('pinBtn').addEventListener('click',()=>show('pinSheet'));
-document.getElementById('redPinBtn').addEventListener('click',()=>{addMarking('我的标记');alert('已在地图中间加了一个红 marking')});
+// 黑 Pin = 重新定位，点它跳重新定位窗
+document.getElementById('pinBtn').addEventListener('click',()=>show('relocSheet'));
+// 📌 = 在地图加 marking
+document.getElementById('redPinBtn').addEventListener('click',()=>show('pinSheet'));
 document.getElementById('closePinBtn').addEventListener('click',()=>hide('pinSheet'));
 document.getElementById('confirmPinBtn').addEventListener('click',()=>{let t=document.getElementById('pinText').value.trim()||'我的标记';addMarking(t);hide('pinSheet')});
-document.getElementById('relocBtn').addEventListener('click',()=>show('relocSheet'));
 document.getElementById('closeRelocBtn').addEventListener('click',()=>hide('relocSheet'));
 document.getElementById('confirmRelocBtn').addEventListener('click',()=>{manual=document.getElementById('manualLoc').value.trim()||'G 020';document.getElementById('pillText').innerText=manual;document.getElementById('trackList').innerText=cur+'楼 - '+manual;document.getElementById('myDot').style.display='block';document.getElementById('myPos').style.display='block';document.getElementById('myPos').innerText='📍 '+manual;hide('relocSheet')});
 document.getElementById('floorBtn').addEventListener('click',()=>show('floorSheet'));
@@ -183,4 +131,4 @@ document.getElementById('navBtn').addEventListener('click',()=>{if(!confirmed){a
 document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on');let type=b.dataset.f;document.querySelectorAll('.pin').forEach(p=>{if(type==='all'||p.dataset.type===type||p.id==='myPos')p.style.display='block';else p.style.display='none'})}));
 </script>
 </body>
-    </html>
+                                                                                         </html>
