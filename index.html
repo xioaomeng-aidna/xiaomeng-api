@@ -9,8 +9,8 @@
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;background:#0b0f14;color:#fff;overflow:hidden}
 .top{padding:12px 12px 8px;background:#10161d;position:relative;z-index:200}
 .row1{display:flex;align-items:center;gap:8px}
-.pill{flex:1;background:#fff;color:#111;border-radius:999px;padding:10px 12px;display:flex;align-items:center;gap:6px;font-weight:700}
-.pill small{color:#666;font-weight:400}
+.searchbar{flex:1;background:#fff;color:#111;border-radius:999px;padding:10px 12px;display:flex;align-items:center;gap:6px;font-weight:700;cursor:pointer}
+.searchbar small{color:#666;font-weight:400}
 .ai{background:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer}
 .avatar{width:40px;height:40px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;cursor:pointer;position:relative;z-index:201}
 .row2{display:flex;gap:8px;margin-top:10px;overflow:auto}
@@ -18,38 +18,41 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .row2 button.on{background:#fff;color:#111;font-weight:800}
 .mapwrap{position:relative;height:62vh;overflow:hidden;background:#d9d9d9}
 .map{position:absolute;inset:0;background-color:#e8e8e8;background-image:url('map-G.png'),linear-gradient(#ccc 1px,transparent 1px),linear-gradient(90deg,#ccc 1px,transparent 1px);background-size:cover,40px 40px,40px 40px;background-position:center;transform:perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25);transform-origin:center;pointer-events:none;z-index:1}
+.map.gpsmode{transform:none;background:none}
+.map.gpsmode iframe{width:100%;height:100%;border:0}
 .pin{position:absolute;transform:translate(-50%,-100%);background:#fff;color:#111;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.4);z-index:2}
 .pin.blue{background:#2f7bff;color:#fff}
 .pin.red{background:#ff3b30;color:#fff}
-.pin.mypin{background:#ffd60a;color:#111}
 .mydot{position:absolute;width:18px;height:18px;background:#2f7bff;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 8px rgba(47,123,255,.25);z-index:3;display:none;transform:translate(-50%,-50%)}
 .righttools{position:fixed;right:12px;top:150px;z-index:90;display:flex;flex-direction:column;gap:12px;align-items:center}
-.rbtn{width:56px;height:56px;border-radius:16px;background:#fff;color:#111;border:0;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
-.rbtn.black{background:#111;color:#fff;border-radius:999px;width:72px;height:56px}
-.rbtn.redpin{background:#fff;color:#111;border-radius:999px;width:72px;height:56px;font-size:30px}
-.rbtn.big{width:72px;height:72px;border-radius:20px;font-size:48px;font-weight:900}
+.rbtn{width:56px;height:56px;border-radius:50%;background:#fff;color:#111;border:0;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.rbtn.black{background:#111;color:#fff;width:56px;height:56px;border-radius:50%}
+.rbtn.redpin{background:#fff;color:#111;width:56px;height:56px;border-radius:50%;font-size:28px}
+.rbtn.big{width:64px;height:64px;border-radius:50%;font-size:36px;font-weight:900}
 .rbtn.red{border:3px solid #ff3b30}
 .rbtn.cyan{border:3px solid #00d4c5;background:#e0fffc}
 .rlabel{font-size:11px;color:#fff;background:rgba(0,0,0,.7);border-radius:999px;padding:2px 8px;margin-top:-8px}
-.sheet{position:fixed;inset:auto 0 0 0;background:#fff !important;color:#111 !important;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:100;max-height:70vh;overflow:auto;color-scheme:light}
+.sheet{position:fixed;inset:auto 0 0 0;background:#fff !important;color:#111 !important;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:100;max-height:75vh;overflow:auto;color-scheme:light}
 .sheet.show{display:block}
-.sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff !important;color:#111 !important;margin-top:8px;font-size:16px;cursor:pointer}
-.sheet button.primary{background:#111 !important;color:#fff !important}
-.sheet button.cyan{background:#00d4c5 !important;color:#111 !important;font-weight:800}
+.sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff !important;color:#111 !important;margin-top:8px;font-size:16px;cursor:pointer;text-align:left}
+.sheet button.primary{background:#111 !important;color:#fff !important;text-align:center}
+.sheet button.cyan{background:#00d4c5 !important;color:#111 !important;font-weight:800;text-align:center}
 .sheet input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;background:#f5f5f5;color:#111;outline:none}
 .aiinput{display:flex;gap:8px;margin-top:10px}
 .aiinput input{flex:1}
-.aiinput button{width:70px !important;margin-top:0 !important;background:#111 !important;color:#fff !important}
-.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:300;overflow:auto;box-shadow:-4px 0 20px rgba(0,0,0,.3)}
+.aiinput button{width:70px !important;margin-top:0 !important;background:#111 !important;color:#fff !important;text-align:center !important}
+.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:300;overflow:auto}
 .drawer.show{display:block}
 .navbtn{margin:12px;background:#00d4c5;color:#111;border:0;border-radius:999px;padding:14px;width:calc(100% - 24px);font-weight:800;font-size:16px;cursor:pointer}
 .navbtn:disabled{background:#333;color:#888}
+.badge{position:fixed;left:12px;bottom:80px;background:#111;color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;z-index:90}
+.autotag{position:fixed;left:12px;top:130px;background:#ff3b30;color:#fff;border-radius:999px;padding:6px 10px;font-size:11px;z-index:95;display:none}
 </style>
 </head>
 <body>
 <div class="top">
   <div class="row1">
-    <div class="pill">📍 <span id="pillText">MAYBANK</span> <small id="pillFloor">G(E)</small></div>
+    <div class="searchbar" id="searchBar">🔍 <span id="pillText">搜 Mid Valley...</span> <small id="pillFloor">G(E)</small></div>
     <button class="ai" id="aiBtn">✨ AI</button>
     <div class="avatar" id="avatarBtn">👧</div>
   </div>
@@ -62,73 +65,186 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
   </div>
 </div>
 <div class="mapwrap">
-  <div class="map" id="map"></div>
-  <div class="pin" style="left:58%;top:32%" data-type="elevator">🛗 电梯</div>
-  <div class="pin blue" style="left:34%;top:52%" data-type="escalator">↗️ 电扶梯</div>
-  <div class="pin" style="left:74%;top:58%" data-type="toilet">🚻 厕所</div>
-  <div class="pin red" style="left:22%;top:28%" data-type="exit">🚪 安全出口</div>
+  <div class="map gpsmode" id="map"><iframe id="gpsFrame" src="https://maps.google.com/maps?q=Mid%20Valley%20Megamall%20Kuala%20Lumpur&t=&z=16&ie=UTF8&iwloc=&output=embed"></iframe></div>
   <div class="pin" id="myPos" style="left:48%;top:68%;background:#ff3b30;color:#fff;display:none">📍 你在这里</div>
   <div class="mydot" id="myDot" style="left:48%;top:68%"></div>
   <div id="pinLayer"></div>
+  <div class="badge" id="statusBadge">🗺️ GPS 地图 - 搜 Mid Valley</div>
+  <div class="autotag" id="autoTag">🔔 自动检测中...</div>
 </div>
 <div class="righttools">
   <button class="rbtn" id="compassBtn"><svg width="34" height="34" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fff"/><polygon points="24,8 28,24 20,24" fill="#ff3b30"/><polygon points="24,40 28,24 20,24" fill="#111"/><text x="24" y="18" font-size="9" font-weight="900" text-anchor="middle" fill="#ff3b30">N</text><circle cx="24" cy="24" r="3" fill="#fff" stroke="#111"/></svg></button>
   <button class="rbtn" id="locateBtn"><svg width="32" height="32" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="#2f7bff" stroke-width="4"/><circle cx="24" cy="24" r="6" fill="#2f7bff"/><path d="M24 2v8M24 38v8M2 24h8M38 24h8" stroke="#2f7bff" stroke-width="4" stroke-linecap="round"/></svg></button>
-  <!-- 黑 Pin：点它 = 重新定位 / 手动定位，就像你第二张图箭头那样 -->
-  <button class="rbtn black" id="pinBtn"><svg width="48" height="38" viewBox="0 0 72 56"><rect x="2" y="2" width="68" height="52" rx="26" fill="#111"/><path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/><circle cx="36" cy="22" r="12" fill="#111"/><path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></button>
-  <!-- 红色那个换成 📌，点它 = 在地图加 marking -->
+  <button class="rbtn black" id="pinBtn"><svg width="36" height="36" viewBox="0 0 56 56"><path d="M28 6 C18 6 13 13 13 21 C13 31 28 46 28 46 C28 46 43 31 43 21 C43 13 38 6 28 6 Z" fill="none" stroke="#fff" stroke-width="3.5"/><circle cx="28" cy="21" r="10" fill="#111"/><path d="M28 15v12M22 21h12" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg></button>
   <button class="rbtn redpin" id="redPinBtn">📌</button>
   <button class="rbtn big red" id="floorBtn">G</button>
   <div class="rlabel" id="floorLabel">未确认</div>
 </div>
-<!-- 左下角重新定位已经删了 -->
-<button class="navbtn" id="navBtn" disabled>先确认楼层，才能开始导航</button>
-<div class="sheet" id="floorSheet"><h3>确认楼层</h3><p>你现在在 <b id="selFloor">G楼</b> 吗？</p><button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button><button class="cyan" id="confirmFloorBtn">确认 ✓ 我在这一层</button><button id="closeFloorBtn">取消</button></div>
-<div class="sheet" id="relocSheet"><h3>🔄 重新定位</h3><p style="color:#666;font-size:14px">走到乱了？站在店门口，输入店号校准</p><input id="manualLoc" placeholder="例如 G 020" value="G 020"><button class="primary" id="confirmRelocBtn">校准 ✓ 我在 G 020</button><button id="closeRelocBtn">取消</button></div>
-<div class="sheet" id="pinSheet"><h3>📌 手动加 Marking</h3><input id="pinText" placeholder="例如：停车位" value="我的标记"><button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button><button id="closePinBtn">取消</button></div>
-<div class="sheet" id="aiSheet">
-  <h3>✨ 问小萌 - Gemini</h3>
-  <p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，直接打字问我，我用 Gemini 回答你。</p>
-  <div class="aiinput"><input id="aiInput" placeholder="自己打字：例如 厕所在哪里？"><button id="aiSend">发送</button></div>
-  <button class="primary" id="closeAIBtn">关闭</button>
+<button class="navbtn" id="navBtn" disabled>先进入室内地图，才能导航</button>
+<div class="sheet" id="searchSheet"><h3>🔍 搜索</h3><input id="searchInput" placeholder="搜 Mid Valley / MAYBANK / 厕所..." value="Mid Valley"><div id="searchResults"></div><button id="closeSearchBtn">关闭</button></div>
+<div class="sheet" id="enterSheet"><h3>📍 定位成功</h3><p id="enterText">你在 Mid Valley 附近，距离 <b>120 米</b>，要进入 Mid Valley 室内地图吗？</p><p style="color:#666;font-size:13px">500 米以内，XY 网可以带，开始导航</p><button class="cyan" id="enterYesBtn">是 ✓ 进入室内地图</button><button id="enterNoBtn">不要，还在外面</button></div>
+<div class="sheet" id="startNavSheet"><h3>🧭 开始导航？</h3><p>你已在室内地图，XY 网已对齐，要开始带你去 <b>G 020</b> 吗？</p><button class="cyan" id="startNavYesBtn">是 ✓ 开始带</button><button id="startNavNoBtn">先逛逛</button></div>
+
+<!-- 6. 自动确认楼层：不用手点，条件到了自己弹 + 有声 -->
+<div class="sheet" id="floorSheet">
+  <h3>🔔 请确认楼层 <span style="font-size:12px;color:#ff3b30">自动弹出</span></h3>
+  <p id="floorReason">系统自动检测到你可能换楼层了，你现在在 <b id="selFloor">G楼</b> 吗？</p>
+  <p id="floorDetail" style="background:#fff3cd;border-radius:8px;padding:8px;font-size:13px;color:#666">原因：走了 10 米</p>
+  <button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button>
+  <button class="cyan" id="confirmFloorBtn">确认 ✓ 我在这一层</button>
+  <button id="closeFloorBtn">我没换楼，继续</button>
 </div>
+
+<div class="sheet" id="relocSheet"><h3>🔄 重新定位</h3><input id="manualLoc" placeholder="例如 G 020" value="G 020"><button class="primary" id="confirmRelocBtn">校准 ✓ 我在 G 020</button><button id="closeRelocBtn">取消</button></div>
+<div class="sheet" id="pinSheet"><h3>📌 手动加 Marking</h3><input id="pinText" placeholder="例如：停车位" value="我的标记"><button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button><button id="closePinBtn">取消</button></div>
+<div class="sheet" id="aiSheet"><h3>✨ 问小萌 - Gemini</h3><p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，直接打字问我，我用 Gemini 回答你。</p><div class="aiinput"><input id="aiInput" placeholder="自己打字：例如 厕所在哪里？"><button id="aiSend">发送</button></div><button class="primary" id="closeAIBtn">关闭</button></div>
 <div class="drawer" id="drawer"><h3>👧 我的小萌</h3><div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0"><b>📍 我的足迹</b><br><span id="trackList">未确认楼层</span></div><button id="closeDrawerBtn" style="width:100%;padding:12px;border-radius:12px;background:#111;color:#fff;border:0">关闭</button></div>
 <script>
-let cur='G', confirmed=false, manual='G 020';
+let cur='G', confirmed=false, manual='G 020', locateStep=0, inIndoor=false, navigating=false;
+let lastPos=null, walked=0, lastFloorCheck=Date.now(), floorPopupOpen=false, lastAlt=null, gpsLostAt=0;
+const MV={lat:3.1175,lng:101.6772};
+// 室内设施的 GPS 大概位置，用来判断你靠近电梯 / 出入口 / 电扶梯
+const FACILITIES=[
+  {name:'🛗 电梯', lat:3.1174, lng:101.6770},
+  {name:'↗️ 电扶梯', lat:3.1176, lng:101.6774},
+  {name:'🚪 安全出口', lat:3.1172, lng:101.6775},
+  {name:'🚻 厕所', lat:3.1178, lng:101.6771},
+];
 function show(id){document.getElementById(id).classList.add('show')}
 function hide(id){document.getElementById(id).classList.remove('show')}
-function hideAll(){['floorSheet','relocSheet','pinSheet','aiSheet'].forEach(hide)}
-function addMarking(t){let d=document.createElement('div');d.className='pin mypin';d.style.left='50%';d.style.top='50%';d.style.background='#ff3b30';d.style.color='#fff';d.innerText='📌 '+t;document.getElementById('pinLayer').appendChild(d)}
-async function askAI(q){
-  document.getElementById('aiReply').innerText='小萌正在问 Gemini...';
+function hideAll(){['floorSheet','relocSheet','pinSheet','aiSheet','searchSheet','enterSheet','startNavSheet'].forEach(hide)}
+function distM(a,b,c,d){let R=6371000,dx=(c-a)*Math.PI/180,dy=(d-b)*Math.PI/180;let h=Math.sin(dx/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dy/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function setBadge(t){document.getElementById('statusBadge').innerText=t}
+
+// 🔔 提示声：叮咚 + 震动，手机一定要先点过一次页面才有声
+let audioCtx=null;
+function playAlertSound(){
   try{
-    let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur,shop_nearby:manual})});
-    let d=await r.json();
-    document.getElementById('aiReply').innerText=d.reply||('Gemini 出错了：'+(d.error||JSON.stringify(d)));
-  }catch(e){document.getElementById('aiReply').innerText='连不到 /api/chat：'+e.message}
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    [880, 660, 880].forEach((f,i)=>{
+      let o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=f; o.type='sine';
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + i*0.25);
+      g.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + i*0.25 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + i*0.25 + 0.22);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + i*0.25); o.stop(audioCtx.currentTime + i*0.25 + 0.25);
+    });
+  }catch(e){}
+  if(navigator.vibrate) navigator.vibrate([200,100,200,100,300]);
+  // 语音也讲一句
+  try{let u=new SpeechSynthesisUtterance('请确认楼层');u.lang='zh-CN';speechSynthesis.speak(u);}catch(e){}
 }
+
+// 6. 自动弹确认楼层
+function autoFloorPopup(reason, detail){
+  if(!inIndoor || !navigating || floorPopupOpen) return;
+  floorPopupOpen=true;
+  document.getElementById('floorReason').innerHTML=reason+'，你现在在 <b>'+cur+'楼</b> 吗？';
+  document.getElementById('floorDetail').innerText='原因：'+detail;
+  playAlertSound();
+  document.getElementById('autoTag').style.display='block';
+  document.getElementById('autoTag').innerText='🔔 '+detail+' → 请确认楼层';
+  show('floorSheet');
+  // 如果用户 10 秒没理，再响一次
+  setTimeout(()=>{if(floorPopupOpen) playAlertSound()}, 10000);
+}
+
+// 持续监听 GPS，自动判断
+if(navigator.geolocation){
+  navigator.geolocation.watchPosition(p=>{
+    let lat=p.coords.latitude, lng=p.coords.longitude, alt=p.coords.altitude;
+    gpsLostAt=0;
+    if(lastPos){
+      let d=distM(lastPos.lat, lastPos.lng, lat, lng);
+      if(d>0.5 && d<50){ // 过滤 GPS 跳点
+        walked+=d;
+        setBadge('🧭 导航中 · 已走 '+Math.round(walked)+' 米 · 自动检测楼层中');
+        // 条件 1：走了 10 米
+        if(walked>=10){
+          autoFloorPopup('你走了 '+Math.round(walked)+' 米，前面可能有楼层变化','走了 10 米');
+          walked=0;
+        }
+      }
+      // 条件 2：靠近电梯 / 电扶梯 / 出入口
+      FACILITIES.forEach(f=>{
+        let fd=distM(lat,lng,f.lat,f.lng);
+        if(fd<15 && Date.now()-lastFloorCheck>30000){
+          lastFloorCheck=Date.now();
+          autoFloorPopup('你靠近 '+f.name+'，可能要换楼层','靠近 '+f.name+' ('+Math.round(fd)+' 米)');
+        }
+      });
+      // 条件 3：高度变了 > 3 米，怀疑换楼层
+      if(alt!=null && lastAlt!=null && Math.abs(alt-lastAlt)>3){
+        autoFloorPopup('检测到高度变化 '+(alt-lastAlt).toFixed(1)+' 米，可能换楼层了','高度变化 '+(alt-lastAlt).toFixed(1)+' 米');
+      }
+    }
+    lastPos={lat,lng}; if(alt!=null) lastAlt=alt;
+  }, err=>{
+    // 条件 4：GPS 断了，5 秒后回来也算换楼层可能
+    if(!gpsLostAt) gpsLostAt=Date.now();
+    if(Date.now()-gpsLostAt>5000){
+      autoFloorPopup('GPS 信号断了又回来，可能你进了电梯 / 换楼层了','GPS 断线 5 秒后恢复');
+      gpsLostAt=Date.now();
+    }
+  }, {enableHighAccuracy:true, maximumAge:1000, timeout:5000});
+}
+// 模拟演示：如果你在电脑上没 GPS，每 30 秒自动弹一次给你看效果
+setInterval(()=>{ if(inIndoor && navigating && !floorPopupOpen && Math.random()<0.15) autoFloorPopup('你走了 10 米，前面有电梯 / 出入口','模拟：走了 10 米 (演示)'); }, 30000);
+
+function doSearch(){
+  let q=document.getElementById('searchInput').value.trim().toLowerCase();
+  let box=document.getElementById('searchResults'); box.innerHTML='';
+  let list=[];
+  if(q.includes('mid')||q.includes('valley')||!q) list=[{t:'📍 Mid Valley Megamall - Kuala Lumpur',s:'GPS 地图 · Lingkaran Syed Putra',type:'mv'}];
+  else if(q.includes('maybank')) list=[{t:'🏦 MAYBANK - G(E)-016',s:'室内地图 G楼 东翼',type:'indoor'}];
+  else list=[{t:'📍 Mid Valley Megamall - Kuala Lumpur',s:'GPS 地图',type:'mv'}];
+  list.forEach(it=>{
+    let b=document.createElement('button'); b.innerHTML='<b>'+it.t+'</b><br><small style="color:#666">'+it.s+'</small>';
+    b.onclick=()=>{hide('searchSheet');document.getElementById('pillText').innerText=it.type==='mv'?'Mid Valley Megamall':it.t;
+      if(it.type==='mv'){inIndoor=false;locateStep=0;document.getElementById('map').className='map gpsmode';document.getElementById('map').innerHTML='<iframe src="https://maps.google.com/maps?q=Mid%20Valley%20Megamall%20Kuala%20Lumpur&t=&z=16&ie=UTF8&iwloc=&output=embed"></iframe>';setBadge('🗺️ GPS 地图 - Mid Valley Megamall');}
+      else enterIndoor();
+    }; box.appendChild(b);
+  });
+}
+document.getElementById('searchBar').addEventListener('click',()=>{show('searchSheet');doSearch()});
+document.getElementById('searchInput').addEventListener('input',doSearch);
+document.getElementById('closeSearchBtn').addEventListener('click',()=>hide('searchSheet'));
+function enterIndoor(){
+  inIndoor=true;document.getElementById('map').className='map';document.getElementById('map').innerHTML='';document.getElementById('myDot').style.display='block';document.getElementById('myPos').style.display='block';setBadge('🏬 室内地图 G楼 · XY 网已对齐 · 500米内可带 · 自动检测楼层开着');
+  let nav=document.getElementById('navBtn');nav.disabled=false;nav.innerText='开始导航 → 去 '+manual;show('startNavSheet');
+}
+document.getElementById('locateBtn').addEventListener('click',()=>{
+  if(inIndoor){ setBadge('🧭 导航中 · 自动检测楼层开着，不用手点'); return; }
+  locateStep++;
+  if(locateStep===1){
+    if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{let d=Math.round(distM(p.coords.latitude,p.coords.longitude,MV.lat,MV.lng));document.getElementById('enterText').innerHTML='你在 Mid Valley 附近，距离 <b>'+d+' 米</b>，要进入 Mid Valley 室内地图吗？';show('enterSheet');},()=>show('enterSheet'),{timeout:3000});} else show('enterSheet');
+  } else show('enterSheet');
+});
+document.getElementById('enterYesBtn').addEventListener('click',()=>{hide('enterSheet');enterIndoor()});
+document.getElementById('enterNoBtn').addEventListener('click',()=>hide('enterSheet'));
+document.getElementById('startNavYesBtn').addEventListener('click',()=>{navigating=true;hide('startNavSheet');setBadge('🧭 导航中 · 自动检测楼层开着 · 走 10 米 / 靠近电梯会自动弹 + 响');alert('开始带：G楼 '+manual+'，不用手点，走了 10 米 / 靠近电梯 / 换楼层，会自动弹确认楼层 + 叮咚声')});
+document.getElementById('startNavNoBtn').addEventListener('click',()=>hide('startNavSheet'));
 document.getElementById('aiBtn').addEventListener('click',()=>{hide('drawer');show('aiSheet')});
 document.getElementById('closeAIBtn').addEventListener('click',()=>hide('aiSheet'));
+async function askAI(q){document.getElementById('aiReply').innerText='小萌正在问 Gemini...';try{let r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur,shop_nearby:manual})});let d=await r.json();document.getElementById('aiReply').innerText=d.reply||('Gemini 出错了：'+(d.error||JSON.stringify(d)));}catch(e){document.getElementById('aiReply').innerText='连不到 /api/chat：'+e.message}}
 document.getElementById('aiSend').addEventListener('click',()=>{let v=document.getElementById('aiInput').value.trim();if(!v) return;askAI(v);document.getElementById('aiInput').value=''});
-document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter'){document.getElementById('aiSend').click()}});
 document.getElementById('avatarBtn').addEventListener('click',()=>{hideAll();show('drawer')});
 document.getElementById('closeDrawerBtn').addEventListener('click',()=>hide('drawer'));
 document.getElementById('compassBtn').addEventListener('click',()=>{document.getElementById('map').style.transform='perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25)'});
-document.getElementById('locateBtn').addEventListener('click',()=>{document.getElementById('myDot').style.display='block';document.getElementById('myPos').style.display='block';document.getElementById('myPos').innerText='📍 '+manual});
-// 黑 Pin = 重新定位，点它跳重新定位窗
 document.getElementById('pinBtn').addEventListener('click',()=>show('relocSheet'));
-// 📌 = 在地图加 marking
 document.getElementById('redPinBtn').addEventListener('click',()=>show('pinSheet'));
 document.getElementById('closePinBtn').addEventListener('click',()=>hide('pinSheet'));
-document.getElementById('confirmPinBtn').addEventListener('click',()=>{let t=document.getElementById('pinText').value.trim()||'我的标记';addMarking(t);hide('pinSheet')});
+document.getElementById('confirmPinBtn').addEventListener('click',()=>{let t=document.getElementById('pinText').value.trim()||'我的标记';let d=document.createElement('div');d.className='pin';d.style.left='50%';d.style.top='50%';d.style.background='#ff3b30';d.style.color='#fff';d.innerText='📌 '+t;document.getElementById('pinLayer').appendChild(d);hide('pinSheet')});
 document.getElementById('closeRelocBtn').addEventListener('click',()=>hide('relocSheet'));
 document.getElementById('confirmRelocBtn').addEventListener('click',()=>{manual=document.getElementById('manualLoc').value.trim()||'G 020';document.getElementById('pillText').innerText=manual;document.getElementById('trackList').innerText=cur+'楼 - '+manual;document.getElementById('myDot').style.display='block';document.getElementById('myPos').style.display='block';document.getElementById('myPos').innerText='📍 '+manual;hide('relocSheet')});
 document.getElementById('floorBtn').addEventListener('click',()=>show('floorSheet'));
-document.getElementById('closeFloorBtn').addEventListener('click',()=>hide('floorSheet'));
+document.getElementById('closeFloorBtn').addEventListener('click',()=>{floorPopupOpen=false;hide('floorSheet');document.getElementById('autoTag').style.display='none'});
 document.querySelectorAll('#floorSheet [data-floor]').forEach(b=>b.addEventListener('click',()=>{cur=b.dataset.floor;document.getElementById('selFloor').innerText=cur+'楼'}));
-document.getElementById('confirmFloorBtn').addEventListener('click',()=>{confirmed=true;let fb=document.getElementById('floorBtn');fb.innerText=cur;fb.classList.remove('red');fb.classList.add('cyan');document.getElementById('floorLabel').innerText='已确认';document.getElementById('pillFloor').innerText=cur+'(E)';document.getElementById('trackList').innerText=cur+'楼 - '+manual+' (已确认)';let nav=document.getElementById('navBtn');nav.disabled=false;nav.innerText='开始导航 → 去 '+manual;hide('floorSheet')});
-document.getElementById('navBtn').addEventListener('click',()=>{if(!confirmed){alert('请先确认楼层');show('floorSheet');return}alert('开始导航：'+cur+'楼 '+manual)});
-document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on');let type=b.dataset.f;document.querySelectorAll('.pin').forEach(p=>{if(type==='all'||p.dataset.type===type||p.id==='myPos')p.style.display='block';else p.style.display='none'})}));
+document.getElementById('confirmFloorBtn').addEventListener('click',()=>{confirmed=true;floorPopupOpen=false;let fb=document.getElementById('floorBtn');fb.innerText=cur;fb.classList.remove('red');fb.classList.add('cyan');document.getElementById('floorLabel').innerText='已确认';document.getElementById('pillFloor').innerText=cur+'(E)';document.getElementById('trackList').innerText=cur+'楼 - '+manual+' (已确认)';hide('floorSheet');document.getElementById('autoTag').style.display='none';setBadge('🏬 室内 '+cur+'楼 已确认 · 继续带 · 自动检测开着')});
+document.getElementById('navBtn').addEventListener('click',()=>{if(!inIndoor){show('enterSheet');return} show('startNavSheet')});
+document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
 </script>
 </body>
-                                                                                         </html>
+                                        </html>
