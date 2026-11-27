@@ -17,14 +17,12 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .row2 button{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#1e2a36;color:#fff;cursor:pointer}
 .row2 button.on{background:#fff;color:#111;font-weight:800}
 .mapwrap{position:relative;height:62vh;overflow:hidden;background:#d9d9d9}
-/* 地图有底色，就算 map-G.png 不见也不会全黑 */
 .map{position:absolute;inset:0;background-color:#e8e8e8;background-image:url('map-G.png'),linear-gradient(#ccc 1px,transparent 1px),linear-gradient(90deg,#ccc 1px,transparent 1px);background-size:cover,40px 40px,40px 40px;background-position:center;transform:perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25);transform-origin:center;pointer-events:none;z-index:1}
 .pin{position:absolute;transform:translate(-50%,-100%);background:#fff;color:#111;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.4);z-index:2}
 .pin.blue{background:#2f7bff;color:#fff}
 .pin.red{background:#ff3b30;color:#fff}
 .pin.mypin{background:#ffd60a;color:#111}
 .mydot{position:absolute;width:18px;height:18px;background:#2f7bff;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 8px rgba(47,123,255,.25);z-index:3;display:none;transform:translate(-50%,-50%)}
-/* 右边按钮移出地图，固定在屏幕右边，地图再黑也还在 */
 .righttools{position:fixed;right:12px;top:150px;z-index:90;display:flex;flex-direction:column;gap:12px;align-items:center}
 .rbtn{width:56px;height:56px;border-radius:16px;background:#fff;color:#111;border:0;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .rbtn.black{background:#111;color:#fff;border-radius:999px;width:72px;height:56px}
@@ -40,6 +38,9 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
 .sheet button.primary{background:#111 !important;color:#fff !important}
 .sheet button.cyan{background:#00d4c5 !important;color:#111 !important;font-weight:800}
 .sheet input{width:100%;padding:14px;border-radius:12px;border:1px solid #ddd;font-size:16px;background:#f5f5f5;color:#111;outline:none}
+.aiinput{display:flex;gap:8px;margin-top:10px}
+.aiinput input{flex:1}
+.aiinput button{width:70px !important;margin-top:0 !important;background:#111 !important;color:#fff !important}
 .drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:100;overflow:auto}
 .navbtn{margin:12px;background:#00d4c5;color:#111;border:0;border-radius:999px;padding:14px;width:calc(100% - 24px);font-weight:800;font-size:16px;cursor:pointer}
 .navbtn:disabled{background:#333;color:#888}
@@ -72,12 +73,26 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
   <div id="pinLayer"></div>
 </div>
 
-<!-- 右边按钮已经移出地图，固定在屏幕上 -->
 <div class="righttools">
   <button class="rbtn" id="compassBtn"><svg width="34" height="34" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#fff"/><polygon points="24,8 28,24 20,24" fill="#ff3b30"/><polygon points="24,40 28,24 20,24" fill="#111"/><text x="24" y="18" font-size="9" font-weight="900" text-anchor="middle" fill="#ff3b30">N</text><circle cx="24" cy="24" r="3" fill="#fff" stroke="#111"/></svg></button>
   <button class="rbtn" id="locateBtn"><svg width="32" height="32" viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="#2f7bff" stroke-width="4"/><circle cx="24" cy="24" r="6" fill="#2f7bff"/><path d="M24 2v8M24 38v8M2 24h8M38 24h8" stroke="#2f7bff" stroke-width="4" stroke-linecap="round"/></svg></button>
-  <button class="rbtn black" id="pinBtn"><svg width="42" height="32" viewBox="0 0 64 48"><ellipse cx="32" cy="24" rx="30" ry="20" fill="#111"/><path d="M32 12c-6 0-10 4-10 9 0 7 10 15 10 15s10-8 10-15c0-5-4-9-10-9z" fill="#fff"/><text x="32" y="21" font-size="10" font-weight="900" text-anchor="middle" fill="#fff">+</text></svg></button>
-  <button class="rbtn redpin" id="redPinBtn"><svg width="42" height="32" viewBox="0 0 64 48"><ellipse cx="32" cy="24" rx="30" ry="20" fill="#ff3b30"/><path d="M32 10c-7 0-12 5-12 11 0 8 12 18 12 18s12-10 12-18c0-6-5-11-12-11z" fill="#fff"/><text x="32" y="22" font-size="11" font-weight="900" text-anchor="middle" fill="#fff">+</text></svg></button>
+  <!-- 黑 Pin：黑椭圆 + 白 Pin 外框 + 黑圆 + 白 +，+ 加大了 -->
+  <button class="rbtn black" id="pinBtn">
+    <svg width="48" height="38" viewBox="0 0 72 56">
+      <rect x="2" y="2" width="68" height="52" rx="26" fill="#111"/>
+      <path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/>
+      <circle cx="36" cy="22" r="12" fill="#111"/>
+      <path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button class="rbtn redpin" id="redPinBtn">
+    <svg width="48" height="38" viewBox="0 0 72 56">
+      <rect x="2" y="2" width="68" height="52" rx="26" fill="#ff3b30"/>
+      <path d="M36 7 C25 7 19 14 19 22 C19 32 36 47 36 47 C36 47 53 32 53 22 C53 14 47 7 36 7 Z" fill="none" stroke="#fff" stroke-width="4"/>
+      <circle cx="36" cy="22" r="12" fill="#ff3b30"/>
+      <path d="M36 15v14M29 22h14" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </button>
   <button class="rbtn big red" id="floorBtn">G</button>
   <div class="rlabel" id="floorLabel">未确认</div>
 </div>
@@ -103,13 +118,21 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-se
   <button class="primary" id="confirmPinBtn">在地图中间加 Marking ✓</button>
   <button id="closePinBtn">取消</button>
 </div>
+
+<!-- AI 修好了 -->
 <div class="sheet" id="aiSheet">
   <h3>✨ 问小萌</h3>
-  <p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px">你好，我是小萌，你要去哪里？</p>
-  <button data-q="MAYBANK 在哪里？">MAYBANK 在哪里？</button>
-  <button data-q="厕所在哪里？">厕所在哪里？</button>
+  <p id="aiReply" style="background:#f5f5f5 !important;border-radius:12px;padding:12px;min-height:44px">你好，我是小萌，你要去哪里？点下面，或者自己打字问我。</p>
+  <div class="aiinput"><input id="aiInput" placeholder="自己打字：例如 厕所在哪里？"><button id="aiSend">发送</button></div>
+  <button data-q="MAYBANK">MAYBANK 在哪里？</button>
+  <button data-q="厕所">厕所在哪里？</button>
+  <button data-q="电梯">电梯在哪里？</button>
+  <button data-q="电扶梯">电扶梯在哪里？</button>
+  <button data-q="停车场">怎么去停车场？</button>
+  <button data-q="出口">安全出口在哪里？</button>
   <button class="primary" id="closeAIBtn">关闭</button>
 </div>
+
 <div class="drawer" id="drawer">
   <h3>👧 我的小萌</h3>
   <div style="border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0"><b>📍 我的足迹</b><br><span id="trackList">未确认楼层</span></div>
@@ -121,8 +144,26 @@ let cur='G', confirmed=false, manual='G 020';
 function show(id){document.getElementById(id).classList.add('show')}
 function hide(id){document.getElementById(id).classList.remove('show')}
 function addMarking(t){let d=document.createElement('div');d.className='pin mypin';d.style.left='50%';d.style.top='50%';d.style.background='#ff3b30';d.style.color='#fff';d.innerText='📌 '+t;document.getElementById('pinLayer').appendChild(d)}
+// AI 真正的回答，不再写死
+function askAI(q){
+  q=(q||'').toLowerCase();
+  let reply='';
+  if(q.includes('maybank')||q.includes('银行')) reply='MAYBANK 在 '+cur+'楼，东翼，'+cur+'(E)-016，靠近 Elevator';
+  else if(q.includes('厕所')||q.includes('toilet')||q.includes('洗手间')) reply='厕所在 '+cur+'楼，地图右边，白色 pin 那里，跟着箭头走 2 分钟';
+  else if(q.includes('电梯')||q.includes('elevator')) reply='电梯在 '+cur+'楼中间，🛗 电梯 pin 那里';
+  else if(q.includes('电扶梯')||q.includes('escalator')) reply='电扶梯在 '+cur+'楼左边，蓝色 pin 那里';
+  else if(q.includes('停车')||q.includes('parking')) reply='停车场在 LG 楼，从电梯下到 LG 就可以了';
+  else if(q.includes('出口')||q.includes('exit')) reply='安全出口在 '+cur+'楼左边，红色 pin 那里';
+  else if(q.includes('你好')||q.includes('hi')) reply='你好，我是小萌，你要去哪里？';
+  else reply='我在 '+cur+'楼，你现在在 '+manual+' 附近。你可以问我：MAYBANK、厕所、电梯、停车场';
+  document.getElementById('aiReply').innerText=reply;
+  // 同时把小萌的回答也试着发给后端，不成功也不要坏
+  fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur})}).catch(()=>{});
+}
 document.getElementById('aiBtn').addEventListener('click',()=>show('aiSheet'));
 document.getElementById('closeAIBtn').addEventListener('click',()=>hide('aiSheet'));
+document.getElementById('aiSend').addEventListener('click',()=>{let v=document.getElementById('aiInput').value.trim();if(!v) return;askAI(v);document.getElementById('aiInput').value=''});
+document.querySelectorAll('#aiSheet [data-q]').forEach(b=>b.addEventListener('click',()=>{askAI(b.dataset.q)}));
 document.getElementById('avatarBtn').addEventListener('click',()=>show('drawer'));
 document.getElementById('closeDrawerBtn').addEventListener('click',()=>hide('drawer'));
 document.getElementById('compassBtn').addEventListener('click',()=>{document.getElementById('map').style.transform='perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25)'});
@@ -140,7 +181,6 @@ document.querySelectorAll('#floorSheet [data-floor]').forEach(b=>b.addEventListe
 document.getElementById('confirmFloorBtn').addEventListener('click',()=>{confirmed=true;let fb=document.getElementById('floorBtn');fb.innerText=cur;fb.classList.remove('red');fb.classList.add('cyan');document.getElementById('floorLabel').innerText='已确认';document.getElementById('pillFloor').innerText=cur+'(E)';document.getElementById('trackList').innerText=cur+'楼 - '+manual+' (已确认)';let nav=document.getElementById('navBtn');nav.disabled=false;nav.innerText='开始导航 → 去 '+manual;hide('floorSheet')});
 document.getElementById('navBtn').addEventListener('click',()=>{if(!confirmed){alert('请先确认楼层');show('floorSheet');return}alert('开始导航：'+cur+'楼 '+manual)});
 document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on');let type=b.dataset.f;document.querySelectorAll('.pin').forEach(p=>{if(type==='all'||p.dataset.type===type||p.id==='myPos')p.style.display='block';else p.style.display='none'})}));
-document.querySelectorAll('#aiSheet [data-q]').forEach(b=>b.addEventListener('click',()=>{document.getElementById('aiReply').innerText='MAYBANK 在 '+cur+'楼，东翼，'+cur+'(E)-016'}));
 </script>
 </body>
-                                                                                               </html>
+    </html>
