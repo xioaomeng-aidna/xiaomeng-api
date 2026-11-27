@@ -6,30 +6,31 @@
 <title>Mid Valley - Xiaomeng</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;position:fixed;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;background:#0b0f14;color:#fff}
-.top{padding:12px 12px 8px;background:#10161d;position:sticky;top:0;z-index:10}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif;background:#0b0f14;color:#fff;overflow:hidden}
+.top{padding:12px 12px 8px;background:#10161d;position:relative;z-index:50}
 .row1{display:flex;align-items:center;gap:8px}
 .pill{flex:1;background:#fff;color:#111;border-radius:999px;padding:10px 12px;display:flex;align-items:center;gap:6px;font-weight:700}
 .pill small{color:#666;font-weight:400}
-.ai{background:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:800}
-.avatar{width:40px;height:40px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;cursor:pointer}
-.row2{display:flex;gap:8px;margin-top:10px;overflow:auto}
-.row2 button{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#1e2a36;color:#fff}
+.ai{background:#fff;border:0;border-radius:999px;padding:9px 14px;font-weight:800;cursor:pointer;pointer-events:auto}
+.avatar{width:40px;height:40px;border-radius:50%;background:#f0c040;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid #fff;cursor:pointer;pointer-events:auto}
+.row2{display:flex;gap:8px;margin-top:10px;overflow:auto;position:relative;z-index:50}
+.row2 button{white-space:nowrap;border:0;border-radius:999px;padding:8px 14px;background:#1e2a36;color:#fff;cursor:pointer;pointer-events:auto}
 .row2 button.on{background:#fff;color:#111;font-weight:800}
-/* 地图 - 锁死，和 Google Map 一样斜，不能动不能转 */
-.mapwrap{position:relative;height:62vh;overflow:hidden;background:#0b0f14;touch-action:none;overscroll-behavior:none}
-.map{position:absolute;inset:-10% -20%;background:url('map-G.png') center/cover;transform:perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25);transform-origin:center;pointer-events:none;user-select:none;-webkit-user-drag:none}
-.pin{position:absolute;transform:translate(-50%,-100%);background:#fff;color:#111;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.mapwrap{position:relative;height:62vh;overflow:hidden;background:#0b0f14;touch-action:none}
+.map{position:absolute;inset:-10% -20%;background:url('map-G.png') center/cover;transform:perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25);transform-origin:center;pointer-events:none;z-index:1}
+.pin{position:absolute;transform:translate(-50%,-100%);background:#fff;color:#111;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.4);z-index:2;pointer-events:auto}
 .pin.blue{background:#2f7bff;color:#fff}
 .pin.red{background:#ff3b30;color:#fff}
-.floorbtn{position:absolute;right:12px;top:12px;z-index:5;background:#fff;color:#111;border:0;border-radius:999px;padding:10px 14px;font-weight:800}
-.toolbtn{width:44px;height:44px;border-radius:50%;background:#fff;border:0;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer}
+/* 工具按钮移到最上面，地图盖不住 */
+.tools{position:absolute;left:12px;top:12px;z-index:30;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+.toolbtn{width:44px;height:44px;border-radius:50%;background:#fff;border:0;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer;pointer-events:auto}
 .toolbtn.dark{background:#111;color:#fff;font-size:12px;line-height:1.2}
-.sheet{position:fixed;inset:auto 0 0 0;background:#fff;color:#111;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:20;max-height:70vh;overflow:auto}
+.floorbtn{position:absolute;right:12px;top:12px;z-index:30;background:#fff;color:#111;border:0;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;pointer-events:auto}
+.sheet{position:fixed;inset:auto 0 0 0;background:#fff;color:#111;border-radius:20px 20px 0 0;padding:16px;display:none;z-index:100;max-height:70vh;overflow:auto}
 .sheet.show{display:block}
-.sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff;margin-top:8px;font-size:16px}
+.sheet button{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;background:#fff;margin-top:8px;font-size:16px;cursor:pointer}
 .sheet button.primary{background:#111;color:#fff}
-.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:30;overflow:auto}
+.drawer{position:fixed;inset:0 0 0 auto;width:88%;max-width:360px;background:#fff;color:#111;padding:16px;display:none;z-index:100;overflow:auto}
 .drawer.show{display:block}
 .drawer h3{margin:4px 0}.item{border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0}
 </style>
@@ -38,15 +39,15 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;position:fix
 <div class="top">
   <div class="row1">
     <div class="pill">📍 MAYBANK <small>G(E)</small></div>
-    <button class="ai" onclick="openAI()">✨ AI</button>
-    <div class="avatar" onclick="openDrawer()">👧</div>
+    <button class="ai" id="aiBtn">✨ AI</button>
+    <div class="avatar" id="avatarBtn">👧</div>
   </div>
   <div class="row2" id="facRow">
-    <button class="on" onclick="filterFac(this,'all')">全部</button>
-    <button onclick="filterFac(this,'elevator')">🛗 Elevator</button>
-    <button onclick="filterFac(this,'escalator')">↗️ Escalator</button>
-    <button onclick="filterFac(this,'toilet')">🚻 Toilet</button>
-    <button onclick="filterFac(this,'exit')">🚪 Emergency Exit</button>
+    <button class="on" data-f="all">全部</button>
+    <button data-f="elevator">🛗 Elevator</button>
+    <button data-f="escalator">↗️ Escalator</button>
+    <button data-f="toilet">🚻 Toilet</button>
+    <button data-f="exit">🚪 Emergency Exit</button>
   </div>
 </div>
 
@@ -57,28 +58,68 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;position:fix
   <div class="pin" style="left:74%;top:58%" data-type="toilet">🚻 厕所</div>
   <div class="pin red" style="left:22%;top:28%" data-type="exit">🚪 安全出口</div>
   <div class="pin" id="myPos" style="left:48%;top:68%;background:#ff3b30;color:#fff">📍 你在这里</div>
-
-  <!-- 指南针 / 定位 / 重新定位，加回来了 -->
-  <div style="position:absolute;left:12px;top:12px;z-index:6;display:flex;flex-direction:column;gap:8px">
-    <button class="toolbtn" onclick="resetNorth()" title="指南针">🧭</button>
-    <button class="toolbtn" onclick="locateMe()" title="定位">📍</button>
-    <button class="toolbtn dark" onclick="openFloor()">重新<br>定位</button>
+  <div class="tools">
+    <button class="toolbtn" id="compassBtn">🧭</button>
+    <button class="toolbtn" id="locateBtn">📍</button>
+    <button class="toolbtn dark" id="relocBtn">重新<br>定位</button>
   </div>
-  <button class="floorbtn" onclick="openFloor()">G ▾</button>
+  <button class="floorbtn" id="floorBtn">G ▾</button>
 </div>
 
-<!-- 下面开始导航弹窗，已经删掉了，不会再弹出 -->
-
-<!-- 楼层 / 重新定位 -->
 <div class="sheet" id="floorSheet">
   <h3>你现在在哪层？</h3><p>已选择 <b id="selFloor">G楼</b></p>
-  <button onclick="sel('LG')">LG</button>
-  <button onclick="sel('G')">G</button>
-  <button onclick="sel('1')">1</button>
-  <button onclick="sel('2')">2</button>
-  <button onclick="sel('3')">3</button>
-  <button class="primary" onclick="confirmFloor()">确认 ✓ 我在这</button>
-  <button onclick="closeFloor()">取消</button>
+  <button data-floor="LG">LG</button><button data-floor="G">G</button><button data-floor="1">1</button><button data-floor="2">2</button><button data-floor="3">3</button>
+  <button class="primary" id="confirmFloorBtn">确认 ✓ 我在这</button>
+  <button id="closeFloorBtn">取消</button>
 </div>
 
-<!-- AI - 从下面弹，整齐窗面，不是
+<div class="sheet" id="aiSheet">
+  <h3>✨ 问小萌</h3>
+  <p id="aiReply" style="background:#f5f5f5;border-radius:12px;padding:12px">你好，我是小萌，你要去哪里？</p>
+  <button data-q="MAYBANK 在哪里？">MAYBANK 在哪里？</button>
+  <button data-q="厕所在哪里？">厕所在哪里？</button>
+  <button data-q="电梯在哪里？">电梯在哪里？</button>
+  <button data-q="怎么去停车场？">怎么去停车场？</button>
+  <button class="primary" id="closeAIBtn">关闭</button>
+</div>
+
+<div class="drawer" id="drawer">
+  <h3>👧 我的小萌</h3><p>扫描 / 足迹都躲在这里</p>
+  <div class="item"><b>📷 扫描记录</b><br><span id="scanList">暂无，点扫描后会在这里</span></div>
+  <div class="item"><b>📍 我的足迹</b><br><span id="trackList">G楼 - MAYBANK 附近</span></div>
+  <div class="item"><b>🎁 我的优惠</b><br>MAYBANK 附近有优惠</div>
+  <button id="closeDrawerBtn" style="width:100%;padding:12px;border-radius:12px;background:#111;color:#fff;border:0">关闭</button>
+</div>
+
+<script>
+let cur='G';
+function show(id){document.getElementById(id).classList.add('show')}
+function hide(id){document.getElementById(id).classList.remove('show')}
+document.getElementById('aiBtn').addEventListener('click',()=>show('aiSheet'));
+document.getElementById('closeAIBtn').addEventListener('click',()=>hide('aiSheet'));
+document.getElementById('avatarBtn').addEventListener('click',()=>{show('drawer');fetch('/scan').then(r=>r.json()).then(d=>{if(d.scan&&d.scan.length)document.getElementById('scanList').innerText=JSON.stringify(d.scan.slice(-3))}).catch(()=>{})});
+document.getElementById('closeDrawerBtn').addEventListener('click',()=>hide('drawer'));
+document.getElementById('floorBtn').addEventListener('click',()=>show('floorSheet'));
+document.getElementById('relocBtn').addEventListener('click',()=>show('floorSheet'));
+document.getElementById('closeFloorBtn').addEventListener('click',()=>hide('floorSheet'));
+document.getElementById('confirmFloorBtn').addEventListener('click',()=>{
+  document.getElementById('floorBtn').innerText=cur+' ▾';
+  document.getElementById('trackList').innerText=cur+'楼 - MAYBANK 附近';
+  hide('floorSheet');
+  fetch('/tracking',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({floor:cur,x:50,y:50,shop_nearby:'MAYBANK'})}).catch(()=>{})
+});
+document.querySelectorAll('#floorSheet [data-floor]').forEach(b=>b.addEventListener('click',()=>{cur=b.dataset.floor;document.getElementById('selFloor').innerText=cur+'楼'}));
+document.querySelectorAll('#facRow button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#facRow button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  let type=b.dataset.f;
+  document.querySelectorAll('.pin').forEach(p=>{if(type==='all'||p.dataset.type===type||p.id==='myPos')p.style.display='block';else p.style.display='none'})
+}));
+document.querySelectorAll('#aiSheet [data-q]').forEach(b=>b.addEventListener('click',()=>{
+  let q=b.dataset.q;document.getElementById('aiReply').innerText='小萌想一下...';
+  fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg:q,floor:cur})}).then(r=>r.json()).then(d=>{document.getElementById('aiReply').innerText=d.reply||'我在这里'}).catch(()=>{document.getElementById('aiReply').innerText='MAYBANK 在 G楼，东翼，G(E)-016，从你这里往前走 50 米'})
+}));
+document.getElementById('compassBtn').addEventListener('click',()=>{document.getElementById('map').style.transform='perspective(900px) rotateX(45deg) rotateZ(-8deg) scale(1.25)';alert('已回到正北')});
+document.getElementById('locateBtn').addEventListener('click',()=>{document.getElementById('myPos').style.display='block';alert('已定位：你现在在 '+cur+'楼 MAYBANK 附近')});
+</script>
+</body>
+  </html>
